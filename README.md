@@ -201,10 +201,10 @@ class DemoController extends Controller
         }
 
         $this->container->get('lcn.file_uploader')->handleFileUpload(array(
-            'folder' => $this->getTempUploadFolderNameForEditId($editId)
-            //'sizes' => $this->getSizesConfig($galleryName),
-            //'max_number_of_files' => $this->getMaxNumberOfFilesConfig($galleryName),
-            //'allowed_extensions' => $this->allowedExtensions,
+            'folder' => $this->getTempUploadFolderNameForEditId($editId),
+            //'max_number_of_files' => 1, //overwrites parameter lcn_file_uploader.max_number_of_files
+            //'allowed_extensions' => array('zip', 'rar', 'tar'), //overwrites parameter lcn_file_uploader.allowed_extensions
+            //'sizes' => array('thumbnail' => array('folder' => 'thumbnails', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
         ));
     }
 
@@ -282,29 +282,27 @@ Full example:
 You can easily obtain a list of the names of all files stored in a given folder:
 
     $fileUploader = $this->container->get('lcn.file_uploader');
-    $files = $fileUploader->getFiles(array('folder' => 'attachments/' . $entity->getId()));
+    $files = $fileUploader->getFiles(array('folder' => 'lcn-file-uploader-demo/' . $entity->getId()));
 
 However, there is a performance cost associated with accessing the filesystem.
 If you run into performance problems you might want to keep a list of attachments in a Doctrine table or some cache layer.  
 
 
 
-### Advanced Upload Settings
+### Advanced Usage
 
 #### Setting the allowed file types
 
-You can specify custom file types to divert from the default ones (which are defined in Resources/config/services.yml) by either specifying them in the handleFileUpload method or parameters.yml.
+You can specify custom file types to divert from the default ones (which are defined in Resources/config/services.yml) by either specifying them in your handleFileUploadAction method or in parameters.yml.
 
-***In the handleFileUploadAction:***
-
+***Per Widget in corresponding handleFileUploadAction:***
     $this->get('lcn.file_uploader')->handleFileUpload(array(
-        'folder' => 'tmp/attachments/' . $editId,
+        'folder' => 'temp-lcn-file-uploader-demo/' . $editId,
         'allowed_extensions' => array('zip', 'rar', 'tar')
     ));
 
-In this case the FileUploader service will merge the default extensions with the supplied extensions and make a single regex of it. Using regular expression characters could result in errors.
 
-***Parameters.yml:***
+***Globally in parameters.yml:***
 If you have the Symfony standard edition installed you can specify them in app/config/parameters.yml:
 
     file_uploader.allowed_extensions:
@@ -312,18 +310,15 @@ If you have the Symfony standard edition installed you can specify them in app/c
         - rar
         - tar
 
-Doing this will override the default extensions instead of adding them!
+#### Removing Files
 
-Removing Files
-==============
-
-Sooner or later the posting is deleted and you want all of the attachments to be deleted as well.
+When an entity gets deleted you should delete all of the attachments, as well.
 
 You can do this as follows:
 
-    $this->get('punk_ave.file_uploader')->removeFiles(array('folder' => 'attachments/' . $entity->getId()));
+    $this->get('lcn.file_uploader'')->removeFiles(array('folder' => 'lcn-file-uploader-demo/' . $entity->getId()));
 
-You might want to do that in a manager class or a doctrine event listener, but that's not our department.
+You probably might want to do that in a doctrine lifecycle preRemove event listener.
 
 Removing Temporary Files
 ========================
@@ -349,9 +344,9 @@ If `file_uploader.file_base_path` is set as follows (the default):
 
     file_uploader.file_base_path: "%kernel.root_dir%/../web/uploads"
 
-And the `folder` option is set to `attachments/5` when calling `handleFileUpload`, then the uploaded files will arrive in:
+And the `folder` option is set to `lcn-file-uploader-demo/5` when calling `handleFileUpload`, then the uploaded files will arrive in:
 
-    /root/of/your/project/web/uploads/attachments/5/originals
+    /root/of/your/project/web/uploads/lcn-file-uploader-demo/5/originals
 
 If the only attached file for this posting is `botfly.jpg` and you have configured one or more image sizes for the `file_uploader.sizes` option (by default we provide several useful standard sizes), then you will see:
 

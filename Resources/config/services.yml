@@ -1,5 +1,5 @@
 parameters:
-  lcn_file_uploader.max_number_of_files: ~
+  lcn_file_uploader.max_number_of_files: 100
   lcn_file_uploader.file_base_path: "%kernel.root_dir%/../web/uploads"
   lcn_file_uploader.web_base_path: "/uploads"
   lcn_file_uploader.allowed_extensions:

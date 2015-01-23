@@ -99,10 +99,10 @@ class DemoController extends Controller
         }
 
         $this->container->get('lcn.file_uploader')->handleFileUpload(array(
-            'folder' => $this->getTempUploadFolderNameForEditId($editId)
-            //'sizes' => $this->getSizesConfig($galleryName),
-            //'max_number_of_files' => $this->getMaxNumberOfFilesConfig($galleryName),
-            //'allowed_extensions' => $this->allowedExtensions,
+            'folder' => $this->getTempUploadFolderNameForEditId($editId),
+            //'max_number_of_files' => 1, //overwrites parameter lcn_file_uploader.max_number_of_files
+            //'allowed_extensions' => array('zip', 'rar', 'tar', 'gz'), //overwrites parameter lcn_file_uploader.allowed_extensions
+            //'sizes' => array('thumbnail' => array('folder' => 'thumbnails', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
         ));
     }
 
