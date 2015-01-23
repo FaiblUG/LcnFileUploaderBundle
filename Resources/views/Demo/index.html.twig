@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>LcnFileUploaderBundle Demo and Documentation</title>
+    <link rel="stylesheet" href="{{ asset('bundles/lcnfileuploader/dist/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/lcnfileuploader/dist/theme.css') }}">
+</head>
+<body>
+
+<h1>Demo usage of LcnFileUploaderBundle</h1>
+
+<h2>Edit Uploads of temporary entity {{ entityId }}</h2>
+
+{{ form_start(form, { 'attr': { 'id': 'lcn-file-uploader-demo' } }) }}
+
+    {{ form_errors(form) }}
+
+    {% include 'LcnFileUploaderBundle:Default:uploadFormWidget.html.twig' with {
+        'uploadUrl': uploadUrl,
+        'tempUploadFolderName': tempUploadFolderName,
+        'formSelector': '#lcn-file-uploader-demo'
+    } %}
+
+    {{ form_rest(form) }}
+</form>
+
+<h2><a href="{{ path('lcn_file_uploader_demo_create') }}">Create new temporary entity</a></h2>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+<script src="{{ asset('bundles/lcnfileuploader/dist/main.js') }}"></script>
+</body>
+</html>
+

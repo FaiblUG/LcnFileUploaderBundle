@@ -1,0 +1,13 @@
+<script>
+window.lcn_file_uploader_queue = window.lcn_file_uploader_queue || [];
+window.lcn_file_uploader_queue.push({
+    'uploadUrl': '{{ uploadUrl }}',
+    'viewUrl': '{{ lcn_file_uploader_get_web_path(tempUploadFolderName) }}',
+    'el': '{{ formSelector }} .file-uploader',
+    'maxNumberOfFiles': {{ maxNumberOfFiles|default('null') }},
+    'existingFiles': {{ (lcn_file_uploader_get_files(tempUploadFolderName) | json_encode | raw) }},
+    'delaySubmitWhileUploading': '{{ formSelector }}'
+});
+</script>
+{% include "LcnFileUploaderBundle:Default:templates.html.twig" %}
+<div class="file-uploader"></div>

@@ -1,0 +1,96 @@
+parameters:
+  lcn_file_uploader.max_number_of_files: ~
+  lcn_file_uploader.file_base_path: "%kernel.root_dir%/../web/uploads"
+  lcn_file_uploader.web_base_path: "/uploads"
+  lcn_file_uploader.allowed_extensions:
+    # Mime types are just for documentation's sake.
+    # BlueImp filters by supplied extension. No checking of the
+    # actual file contents is done. If your mime types are
+    # configured correctly in Apache the browser will have the
+    # correct expectations for each file
+    - gif #image/gif
+    - png #image/png
+    - jpg #image/jpeg
+    - jpeg #image/jpeg
+    - pdf #application/pdf
+    - mp3 #audio/mpeg
+    - xls #application/vnd.ms-excel
+    - ppt #application/vnd.ms-powerpoint
+    - doc #application/msword
+    - pptx #application/vnd.openxmlformats-officedocument.presentationml.presentation
+    - sldx #application/vnd.openxmlformats-officedocument.presentationml.slide
+    - ppsx #application/vnd.openxmlformats-officedocument.presentationml.slideshow
+    - potx #application/vnd.openxmlformats-officedocument.presentationml.template
+    - xlsx #application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    - xltx #application/vnd.openxmlformats-officedocument.spreadsheetml.template
+    - docx #application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    - dotx #application/vnd.openxmlformats-officedocument.wordprocessingml.template
+    - txt #text/plain
+    - rtf #text/rtf
+
+  # Folder where originals are uploaded. This is the only folder populated for
+  # uploads that are not images
+  lcn_file_uploader.originals:
+      folder: originals
+
+  # Scaled versions of images. These image sizes are pretty great for
+  # 1140 grid / responsive / bootstrap projects, but you can override as you see fit
+  #
+  # Width and height here are maximums to be enforced, NOT an aspect ratio to be enforced.
+  # UploadHandler renders the smallest size that doesn't violate one of the limits.
+  #
+  # If an original is too small it is simply copied for that particular size. In short,
+  # BlueImp did a good job here.
+  #
+  # You need not specify any sizes if you don't want FileUploader to scale images for you
+  lcn_file_uploader.sizes:
+    thumbnail:
+      folder: thumbnails
+      max_width: 200
+      max_height: 150
+      crop: true
+    small:
+      folder: small
+      max_width: 400
+      max_height: 300
+      crop: true
+    medium:
+      folder: medium
+      max_width: 800
+      max_height: 600
+      crop: true
+    large:
+      folder: large
+      max_width: 1200
+      max_height: 900
+      crop: true
+
+services:
+    lcn.file_uploader:
+        class: Lcn\FileUploaderBundle\Services\FileUploader
+        arguments:
+          - file_base_path: '%lcn_file_uploader.file_base_path%'
+            web_base_path: '%lcn_file_uploader.web_base_path%'
+            request: '@request'
+            file_manager: '@lcn.file_uploader_file_manager'
+            allowed_extensions: '%lcn_file_uploader.allowed_extensions%'
+            sizes: '%lcn_file_uploader.sizes%'
+            originals: '%lcn_file_uploader.originals%'
+            max_number_of_files: '%lcn_file_uploader.max_number_of_files%'
+        scope: request
+
+    # You usually won't need this sub-service directly,
+    # however you can access it from a command, which is
+    # convenient if you need to delete files relating to
+    # something in a command context
+    lcn.file_uploader_file_manager:
+        class: Lcn\FileUploaderBundle\Services\FileManager
+        arguments:
+          # For bc reasons we're not changing the names of the parameters
+          - file_base_path: '%lcn_file_uploader.file_base_path%'
+
+    lcn.twig.file_extension:
+        class: Lcn\FileUploaderBundle\Twig\FileUploaderExtension
+        arguments: [@service_container, %lcn_file_uploader.web_base_path%]
+        tags:
+            - { name: twig.extension }

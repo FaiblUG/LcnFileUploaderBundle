@@ -1,0 +1,97 @@
+.lcn-file-uploader {
+
+    margin-top: 1em;
+
+    .error {
+        margin-top: 1em;
+        padding: 1em;
+        background-color: #f00;
+        color: #fff;
+    }
+
+    .thumbnails {
+        list-style-type: none;
+        margin: 1em 0 0 0;
+        padding: 0;
+
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+    .thumbnail {
+        display: block;
+        padding: 5px;
+
+        width: 50%;
+        min-width: 100px;
+        max-width: 200px;
+
+        @media (min-width: 37.5em) {
+            width: 33%;
+        }
+
+        @media (min-width: 48em) {
+            width: 20%;
+        }
+
+        @media (min-width: 64em) {
+            width: 15.5%;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+
+        .download {
+            line-height: 1.5em;
+            word-wrap: break-word;
+        }
+
+        .delete {
+            right: 0;
+            bottom: 0;
+            opacity: 0.8;
+            background-color: red;
+            width: 1.5em;
+            overflow: hidden;
+            color: transparent;
+
+            text-align: center;
+
+            &:before {
+                content: '×';
+                padding: 0.75em;
+                font-size: 0.8em;
+                text-indent: 0;
+                color: #fff;
+                display: inline-block;
+            }
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+    }
+
+    input[type="file"] {
+        &[data-upload-mode="replace"]:hover {
+            background: rgba(255, 255, 255, 0.7);
+            &:before {
+                content: 'Replace File';
+                position: absolute;
+                top: 50%;
+                margin-top: -1em;
+                left: 0;
+                right: 0;
+                bottom: 0;
+
+                color: #000;
+                text-align: center;
+            }
+        }
+    }
+}

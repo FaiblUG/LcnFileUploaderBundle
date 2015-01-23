@@ -1,0 +1,24 @@
+{
+  "name": "lcn-file-uploader-bundle",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Easy ajax file uploads for Symfony 2",
+  "main": "Resources/public/dist/lcn-file-uploader-bundle.js",
+  "devDependencies": {
+    "gulp": "~3.8",
+    "gulp-concat": "~2.4",
+    "gulp-minify-css": "~0.3",
+    "gulp-clean": "~0.3",
+    "gulp-uglify": "~1.0",
+    "gulp-autoprefixer": "~2.1",
+    "autoprefixer": "~4.0",
+    "gulp-sass": "~1.3",
+    "gulp-rename": "~1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FaiblUG/LcnFileUploaderBundle"
+  },
+  "author": "Jonas Fischer-Maeck",
+  "license": "proprietary"
+}

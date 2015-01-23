@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>add_files</source>
+                <target>add files</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>add_file</source>
+                <target>add file</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>spinner_text</source>
+                <target>Uploading...</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>download_file</source>
+                <target>download file</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>delete_file</source>
+                <target>delete file</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>replace_image</source>
+                <target>replace image</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>choose_file</source>
+                <target>choose file</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

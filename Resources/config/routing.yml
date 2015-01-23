@@ -1,0 +1,11 @@
+lcn_file_uploader_demo_create:
+    path:     /lcn-file-uploader/demo
+    defaults: { _controller: LcnFileUploaderBundle:Demo:createOrEdit }
+
+lcn_file_uploader_demo_edit:
+    path:     /lcn-file-uploader/demo/{entityId}
+    defaults: { _controller: LcnFileUploaderBundle:Demo:createOrEdit }
+
+lcn_file_uploader_demo_handle_file_upload:
+    path:     /lcn-file-uploader/demo/file-upload/{editId}
+    defaults: { _controller: LcnFileUploaderBundle:Demo:handleFileUpload }
