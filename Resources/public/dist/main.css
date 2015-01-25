@@ -1,1 +1,26 @@
-.lcn-file-uploader,.lcn-file-uploader *{box-sizing:border-box}.lcn-file-uploader{position:relative}.lcn-file-uploader .thumbnail-inner{position:relative;min-height:3em;line-height:0}.lcn-file-uploader .thumbnail-inner .delete{position:absolute;z-index:2;cursor:pointer}.lcn-file-uploader input[type=file]{position:absolute;z-index:1;outline:0;cursor:pointer;color:transparent}.lcn-file-uploader input[type=file]::-webkit-file-upload-button{visibility:hidden}
+.lcn-file-uploader, .lcn-file-uploader * {
+  box-sizing: border-box; }
+
+.lcn-file-uploader {
+  position: relative; }
+  .lcn-file-uploader .thumbnail-inner {
+    position: relative;
+    min-height: 3em;
+    line-height: 0; }
+    .lcn-file-uploader .thumbnail-inner .delete {
+      position: absolute;
+      z-index: 2;
+      cursor: pointer; }
+  .lcn-file-uploader .file-input-wrapper {
+    position: absolute;
+    z-index: 1;
+    overflow: hidden; }
+    .lcn-file-uploader .file-input-wrapper input[type="file"] {
+      position: absolute;
+      z-index: 2;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      cursor: pointer; }

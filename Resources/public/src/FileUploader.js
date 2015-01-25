@@ -61,9 +61,9 @@ var LcnFileUploader = (function($) {
       .on('fileuploadfail', this.showErrors.bind(this))
     ;
 
-    this.$el.on('mouseenter', '[data-action="replace"], [data-action="add"], input[type="file"]', function (e) {
+    this.$el.on('mouseenter', '[data-action="replace"], [data-action="add"], [data-role="file-input-wrapper"]', function (e) {
       $trigger = $(e.currentTarget);
-      if ($trigger.attr('type') === 'file') {
+      if ($trigger.attr('data-role') === 'file-input-wrapper') {
         //no special action needed
       }
       else if ($trigger.attr('data-action') === 'replace') {
@@ -102,17 +102,28 @@ var LcnFileUploader = (function($) {
       return this.$el.find('input[type="file"]');
     },
 
+    getFileInputWrapper: function() {
+      return this.getFileInputElement().closest('[data-role="file-input-wrapper"]');
+    },
+
     positionInputOverlay: function($el) {
 
       if (this.positionInputOverlayTimeout) {
         clearTimeout(this.positionInputOverlayTimeout);
       }
 
-      var $fileInputElement = this.getFileInputElement();
+      var $fileInputWrapper = this.getFileInputWrapper();
 
-      $fileInputElement.attr('data-upload-mode', this.getUploadMode());
+      if (this.getUploadMode() === 'replace') {
+        $fileInputWrapper.addClass('mode-replace');
+        $fileInputWrapper.removeClass('mode-add');
+      }
+      else {
+        $fileInputWrapper.addClass('mode-add');
+        $fileInputWrapper.removeClass('mode-replace');
+      }
 
-      $fileInputElement.css({
+      $fileInputWrapper.css({
         left: $el.position().left,
         top: $el.position().top,
         width: $el.width(),

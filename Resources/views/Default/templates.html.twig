@@ -18,7 +18,9 @@
             <button type="button" data-action="add" class="add-button"><% if (multiple) { %>{{ 'add_files'|trans }}<% } else { %>{{ 'add_file'|trans }}<% } %></button>
             <div class="controls">
                 {# No name attribute please, that would cause it to submit with a regular form #}
-                <input type="file" title="{{ 'choose_file'|trans }}"<% if (multiple) { %> multiple<% } %>>
+                <div class="file-input-wrapper" data-role="file-input-wrapper">
+                    <input type="file" title="{{ 'choose_file'|trans }}"<% if (multiple) { %> multiple<% } %>>
+                </div>
 
                 <div class="error" data-role="error-message" style="display:none;"></div>
 

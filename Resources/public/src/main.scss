@@ -19,16 +19,21 @@
         }
     }
 
-
-    input[type="file"] {
+    .file-input-wrapper {
         position: absolute;
         z-index: 1;
-        outline: none;
-        cursor: pointer;
-        color: transparent;
+        overflow: hidden;
 
-        &::-webkit-file-upload-button {
-            visibility: hidden;
+        input[type="file"] {
+            position: absolute;
+            z-index: 2;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            cursor: pointer;
         }
     }
+
 }

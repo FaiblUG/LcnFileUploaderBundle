@@ -323,13 +323,13 @@ You probably might want to do that in a doctrine lifecycle preRemove event liste
 Removing Temporary Files
 ========================
 
-If you choose to follow our editId pattern, you'll want to purge contents of web/uploads/tmp that are over a certain age on a periodic basis. People walk away from websites a lot, so not everyone will click your thoughtfully provided "cancel" action that calls removeFiles() based on the editId pattern.
+If you choose to follow our editId pattern, you'll want to purge contents of web/uploads/temp-lcn-file-uploader-demo that are over a certain age on a periodic basis. People walk away from websites a lot, so not everyone will click your thoughtfully provided "cancel" action that calls removeFiles() based on the editId pattern.
 
 Consider installing this shell script as a cron job to be run nightly. This shell script deletes files more than one day old, then deletes empty folders:
 
     #!/bin/sh
-    find /path/to/my/project/web/uploads/tmp -mtime +1 -type f -delete
-    find /path/to/my/project/web/uploads/tmp -mindepth 1 -type d -empty -delete
+    find /path/to/my/project/web/uploads/temp-lcn-file-uploader-demo -mtime +1 -type f -delete
+    find /path/to/my/project/web/uploads/temp-lcn-file-uploader-demo -mindepth 1 -type d -empty -delete
 
 (Since the second command is not recursive, the parent folders may stick around an extra day, but they are removed the next day.)
 
