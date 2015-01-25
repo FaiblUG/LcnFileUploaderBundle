@@ -1,7 +1,7 @@
 LcnFileUploaderBundle
 ========================
 
-Easy ajax uploads for Symfony 2. MIT License.
+Easy ajax file uploads for Symfony 2. MIT License.
 
 Inspired by [punkave/symfony2-file-uploaderbundle](https://github.com/punkave/symfony2-file-uploader-bundle) (no longer maintained)
 

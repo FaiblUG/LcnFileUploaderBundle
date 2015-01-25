@@ -1,0 +1,32 @@
+{
+  "name" : "locaine/lcn-file-uploader-bundle",
+  "description" : "Easy ajax file uploads for Symfony 2",
+  "type" : "symfony-bundle",
+  "authors" : [{
+    "name" : "Jonas Fischer-Maeck",
+    "email" : "info@jonasfischer.net"
+  }],
+  "keywords" : [
+    "Symfony 2",
+    "Ajax",
+    "File Upload"
+  ],
+  "license" : [
+    "MIT"
+  ],
+  "require" : {
+  },
+  "autoload" : {
+    "psr-0" : {
+      "Lcn\\WeatherForecastBundle" : ""
+    }
+  },
+  "target-dir" : "Lcn/FileUploaderBundle",
+  "repositories" : [{
+  }],
+  "extra" : {
+    "branch-alias" : {
+      "dev-master" : "1.0.0-dev"
+    }
+  }
+}
