@@ -69,8 +69,7 @@ services:
     lcn.file_uploader:
         class: Lcn\FileUploaderBundle\Services\FileUploader
         arguments:
-          - container: @service_container
-            file_base_path: '%lcn_file_uploader.file_base_path%'
+          - file_base_path: '%lcn_file_uploader.file_base_path%'
             web_base_path: '%lcn_file_uploader.web_base_path%'
             file_manager: '@lcn.file_uploader_file_manager'
             allowed_extensions: '%lcn_file_uploader.allowed_extensions%'

@@ -15,8 +15,6 @@ class FileUploader
 
     public function __construct($options)
     {
-        $this->request = $options['container']->get('request');
-        unset($this->options['container']);
         $this->options = $options;
     }
 
@@ -118,7 +116,6 @@ class FileUploader
             array(
                 'upload_dir' => $uploadDir, 
                 'upload_url' => $webPath . '/' . $originals['folder'] . '/',
-                'script_url' => $this->request->getUri(),
                 'image_versions' => $sizes,
                 'accept_file_types' => $allowedExtensionsRegex,
                 'max_number_of_files' => $options['max_number_of_files'],
