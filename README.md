@@ -252,7 +252,7 @@ The exact position and order does not matter. However, for best performance you 
 Now include the upload widget anywhere on your page:
 
 ```twig
-{% include 'LcnFileUploaderBundle:Default:uploadFormWidget.html.twig' with {
+{% include 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig' with {
     'uploadUrl': uploadUrl,
     'tempUploadFolderName': tempUploadFolderName,
     'formSelector': '#lcn-file-uploader-demo'
@@ -266,7 +266,7 @@ Full example:
 
     {{ form_errors(form) }}
 
-    {% include 'LcnFileUploaderBundle:Default:uploadFormWidget.html.twig' with {
+    {% include 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig' with {
         'uploadUrl': uploadUrl,
         'tempUploadFolderName': tempUploadFolderName,
         'formSelector': '#lcn-file-uploader-demo'

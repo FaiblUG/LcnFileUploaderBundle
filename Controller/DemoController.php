@@ -70,11 +70,20 @@ class DemoController extends Controller
             }
         }
 
+
+        if ($request->query->get('custom_theme')) {
+            $widgetTheme = 'LcnFileUploaderBundle:Demo:lcnFileUploaderWidget.html.twig';
+        }
+        else {
+            $widgetTheme = 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig';
+        }
+
         return $this->render('LcnFileUploaderBundle:Demo:index.html.twig', array(
             'entityId' => $entityId,
             'form' => $form->createView(),
             'uploadUrl' => $this->generateUrl('lcn_file_uploader_demo_handle_file_upload', array('editId'  => $editId)),
             'tempUploadFolderName' => $this->getTempUploadFolderNameForEditId($editId),
+            'widgetTheme' => $widgetTheme,
         ));
     }
 

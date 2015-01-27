@@ -16,7 +16,7 @@
 
     {{ form_errors(form) }}
 
-    {% include 'LcnFileUploaderBundle:Default:uploadFormWidget.html.twig' with {
+    {% include widgetTheme with {
         'uploadUrl': uploadUrl,
         'tempUploadFolderName': tempUploadFolderName,
         'formSelector': '#lcn-file-uploader-demo'

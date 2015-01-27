@@ -1,0 +1,67 @@
+{% trans_default_domain "lcn_file_uploader_bundle" %}
+{% block lcnFileUploaderWidget %}
+{% spaceless %}
+    <script>
+    window.lcn_file_uploader_queue = window.lcn_file_uploader_queue || [];
+    window.lcn_file_uploader_queue.push({
+        'uploadUrl': '{{ uploadUrl }}',
+        'viewUrl': '{{ lcn_file_uploader_get_web_path(tempUploadFolderName) }}',
+        'el': '{{ formSelector }} .file-uploader',
+        'maxNumberOfFiles': {{ maxNumberOfFiles|default('null') }},
+        'existingFiles': {{ (lcn_file_uploader_get_files(tempUploadFolderName) | json_encode | raw) }},
+        'delaySubmitWhileUploading': '{{ formSelector }}'
+    });
+    </script>
+    <div class="file-uploader"></div>
+{% endspaceless %}
+{% endblock %}
+
+<script type="text/template" id="file-uploader-template">
+    {% block lcnFileUploaderTemplate %}
+    {% spaceless %}
+        {# Contains Underscore templates for the file uploader. #}
+        {# As long as the data-* attributes stay on the appropriate elements #}
+        {# you can override the markup pretty extensively in a local version #}
+        {# of this file. #}
+
+        {# Include this file once in the page. You can instantiate many file uploaders. #}
+        {# Each one must receive a distinct uploadUrl option. You can also pass #}
+        {# an existingFiles option with a list of filenames that should appear in the #}
+        {# editor as having been previously uploaded. #}
+
+        {# "Why is this a Twig file?" Twig allows for a mix of comments not seen in the browser #}
+        {# and Underscore templates. It's easy to include in a Symfony template. #}
+            <div data-role="dropzone">
+                <button type="button" data-action="add" class="add-button"><% if (multiple) { %>{{ 'add_files'|trans }}<% } else { %>{{ 'add_file'|trans }}<% } %></button>
+                <span class="loading-indicator">{{ 'spinner_text'|trans }}</span>
+                <div class="error" data-role="error-message"></div>
+
+                {# No name attribute please, that would cause it to submit with a regular form #}
+                <div class="file-input-wrapper" data-role="file-input-wrapper">
+                    <input type="file" title="{{ 'choose_file'|trans }}"<% if (multiple) { %> multiple<% } %>>
+                </div>
+
+                <ul class="thumbnails" data-role="thumbnails"></ul>
+            </div>
+    {% endspaceless %}
+    {% endblock %}
+</script>
+
+<script type="text/template" id="file-uploader-file-template">
+    {% block lcnFileUploaderFileTemplate %}
+    {% spaceless %}
+        {# parameters to underscore template: name, thumbnail_url, original_url #}
+        <li class="thumbnail" data-name="<%- name %>">
+            <div class="thumbnail-inner"<% if ('undefined' != typeof thumbnailUrl) { %> data-action="replace" title="{{ 'replace_image'|trans }}"<% } %>>
+            {# Some things can be thumbnailed, some things not #}
+            <% if ('undefined' != typeof thumbnailUrl) { %>
+            <img src="<%- thumbnailUrl %>">
+            <% } else { %>
+            <a rel="tooltip" title="{{ 'download_file'|trans }}" class="download thumbnail-action btn" target="download" href="<%- url %>"><%- name %></a>
+            <% } %>
+            <span title="{{ 'delete_file'|trans }}" data-action="delete" class="delete">{{ 'delete_file'|trans }}</span>
+            </div>
+        </li>
+    {% endspaceless %}
+    {% endblock %}
+</script>
