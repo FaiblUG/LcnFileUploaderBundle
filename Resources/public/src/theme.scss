@@ -128,7 +128,7 @@ $loading-indicator-color: #007ba0;
         &:after {
             position: absolute;
             background: lighten($loading-indicator-color, 0.5);
-            content: '\x200B';
+            content: '';
             display: inline-block;
             width: 0.9em;
             height: $loading-indicator-height;
