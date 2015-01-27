@@ -10,6 +10,7 @@ var LcnFileUploader = (function($) {
     this.uploadUrl = options.uploadUrl,
 
     this.$el = $(options.el);
+    this.$el.addClass('lcn-file-uploader');
     this.$el.data('lcn-file-uploader', this);
 
     this.$el.html(uploaderTemplate({
@@ -32,7 +33,7 @@ var LcnFileUploader = (function($) {
     this.$el
       .on('fileuploadadd', function (e, data) {
         if (this.getUploadMode() === 'replace') {
-          this.$el.find('[data-role="spinner"]').show();
+          this.showLoadingIndicator();
           this.deleteFile(this.$replaceFileOnUpload).then(function() {
             data.submit();
           });
@@ -43,12 +44,12 @@ var LcnFileUploader = (function($) {
         }
       }.bind(this))
       .on('fileuploadstart', function (e) {
-        this.$el.find('[data-role="spinner"]').show();
-        this.$errorMessage.hide();
+        this.showLoadingIndicator();
+        this.hideErrors();
         this.uploading = true;
       }.bind(this))
       .on('fileuploadstop', function (e) {
-        this.$el.find('[data-role="spinner"]').hide();
+        this.hideLoadingIndicator();
         this.uploading = false;
       }.bind(this))
       .on('fileuploaddone', function (e, data) {
@@ -134,6 +135,14 @@ var LcnFileUploader = (function($) {
       this.positionInputOverlayTimeout = setTimeout(this.positionInputOverlay.bind(this, $el), 500);
     },
 
+    showLoadingIndicator: function() {
+      this.$el.addClass('loading');
+    },
+
+    hideLoadingIndicator: function() {
+      this.$el.removeClass('loading');
+    },
+
     // Delay form submission until upload is complete.
     // Note that you are welcome to examine the
     // uploading property yourself if this isn't
@@ -182,7 +191,7 @@ var LcnFileUploader = (function($) {
 
       var li = $(fileTemplate(info));
       li.find('[data-action="delete"]').click(function (e) {
-        this.$errorMessage.hide();
+        this.hideErrors();
         var $file = $(e.currentTarget).closest('[data-name]');
         this.deleteFile($file);
         e.preventDefault();
@@ -227,6 +236,10 @@ var LcnFileUploader = (function($) {
     showErrors: function(info) {
       this.$errorMessage.text(info.error).show();
       this.$el.trigger('lcn-file-uploader:error', info)
+    },
+
+    hideErrors: function() {
+      this.$errorMessage.hide();
     }
   };
 

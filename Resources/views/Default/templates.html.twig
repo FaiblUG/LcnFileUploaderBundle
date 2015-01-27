@@ -14,21 +14,16 @@
     {# and Underscore templates. It's easy to include in a Symfony template. #}
 
     <script type="text/template" id="file-uploader-template">
-        <div class="lcn-file-uploader" data-role="dropzone">
+        <div data-role="dropzone">
             <button type="button" data-action="add" class="add-button"><% if (multiple) { %>{{ 'add_files'|trans }}<% } else { %>{{ 'add_file'|trans }}<% } %></button>
-            <div class="controls">
-                {# No name attribute please, that would cause it to submit with a regular form #}
-                <div class="file-input-wrapper" data-role="file-input-wrapper">
-                    <input type="file" title="{{ 'choose_file'|trans }}"<% if (multiple) { %> multiple<% } %>>
-                </div>
+            <span class="loading-indicator">{{ 'spinner_text'|trans }}</span>
+            <div class="error" data-role="error-message"></div>
 
-                <div class="error" data-role="error-message" style="display:none;"></div>
-
-                <span class="spinner" data-role="spinner" style="display: none">
-                    <img src="{{ asset('bundles/lcnfileuploader/images/spinner.gif') }}">
-                    {{ 'spinner_text'|trans }}
-                </span>
+            {# No name attribute please, that would cause it to submit with a regular form #}
+            <div class="file-input-wrapper" data-role="file-input-wrapper">
+                <input type="file" title="{{ 'choose_file'|trans }}"<% if (multiple) { %> multiple<% } %>>
             </div>
+
             <ul class="thumbnails" data-role="thumbnails"></ul>
         </div>
     </script>

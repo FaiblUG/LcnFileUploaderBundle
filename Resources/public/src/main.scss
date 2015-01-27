@@ -19,10 +19,16 @@
         }
     }
 
+    .loading-indicator,
+    .error {
+        display: none;
+    }
+
     .file-input-wrapper {
         position: absolute;
         z-index: 1;
         overflow: hidden;
+        cursor: pointer;
 
         input[type="file"] {
             display: block;
