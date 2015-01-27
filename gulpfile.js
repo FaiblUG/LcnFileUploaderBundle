@@ -13,11 +13,6 @@ var distPath = publicPath + '/dist';
 
 var isBuildMode = false;
 
-function handleError(err) {
-  console.error(err.toString());
-  this.emit('end');
-}
-
 gulp.task('scripts', function() {
   var stream = gulp.src([
     srcPath+'/BlueImp/js/vendor/jquery.ui.widget.js',
@@ -41,7 +36,9 @@ gulp.task('styles', function() {
   var stream = gulp.src([
     srcPath+'/**/*.scss'
   ])
-    .pipe(sass())
+    .pipe(sass({
+      errLogToConsole: true
+    }))
     .pipe(prefix(["last 3 versions", "> 1%"], { cascade: true }));
 
   if (isBuildMode) {

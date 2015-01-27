@@ -1,5 +1,9 @@
-$loading-indicator-height: 1em;
-$loading-indicator-color: #007ba0;
+$error-color: #fff !default;
+$error-bg-color: #f00 !default;
+$delete-color: #fff !default;
+$delete-bg-color: #f00 !default;
+$loading-indicator-height: 1em !default;
+$loading-indicator-color: #007ba0 !default;
 
 
 @keyframes lcn-file-uploader-loading-indicator-animation {
@@ -24,8 +28,8 @@ $loading-indicator-color: #007ba0;
     .error {
         margin-top: 1em;
         padding: 1em;
-        background-color: #f00;
-        color: #fff;
+        background-color: $error-bg-color;
+        color: $error-color;
     }
 
     .thumbnails {
@@ -73,7 +77,7 @@ $loading-indicator-color: #007ba0;
             right: 0;
             bottom: 0;
             opacity: 0.8;
-            background-color: red;
+            background-color: $delete-bg-color;
             width: 1.5em;
             overflow: hidden;
             color: transparent;
@@ -85,7 +89,7 @@ $loading-indicator-color: #007ba0;
                 padding: 0.75em;
                 font-size: 0.8em;
                 text-indent: 0;
-                color: #fff;
+                color: $delete-color;
                 display: inline-block;
             }
 
