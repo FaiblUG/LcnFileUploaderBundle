@@ -4,48 +4,15 @@ namespace Lcn\FileUploaderBundle\Services;
 
 class FileManager
 {
-    protected $options;
-
-    public function __construct($options)
-    {
-        $this->options = $options;
-    }
-
-    public function getFiles($uploadFolderName) {
-        $options = array(
-            'folder' => $uploadFolderName,
-            'file_base_path' => $this->options['file_base_path'],
-        );
-
-        return $this->getFilesForOptions($options);
-    }
-
-    public function getTempFiles($uploadFolderName) {
-        $options = array(
-            'folder' => $uploadFolderName,
-            'file_base_path' => $this->options['temp_file_base_path'],
-        );
-
-        return $this->getFilesForOptions($options);
-    }
 
     /**
-     * Get a list of files already present. The 'folder' option is required.
-     * If you pass consistent options to this method and handleFileUpload with
-     * regard to paths, then you will get consistent results.
+     * Get a list of files in the given directory
      */
-    protected function getFilesForOptions($options = array())
+    public function getFiles($directory)
     {
-        $options = array_merge($this->options, $options);
-        $folder = $options['file_base_path'] . '/' . $options['folder'];
-        if (file_exists($folder))
+        if (file_exists($directory))
         {
-            $dirs = glob("$folder/originals/*");
-            $fullPath = isset($options['full_path']) ? $options['full_path'] : false;
-            if ($fullPath)
-            {
-                return $dirs;
-            }
+            $dirs = glob("$directory/*");
             if (!is_array($dirs)) {
                 $dirs = array();
             }
@@ -59,27 +26,13 @@ class FileManager
     }
 
     /**
-     * Remove the folder specified by 'folder' and its contents.
-     * If you pass consistent options to this method and handleFileUpload with
-     * regard to paths, then you will get consistent results.
+     * Remove the given directory
+     *
+     * @param string $uploadFolderName
      */
-    public function removeFiles($options = array())
+    public function removeFiles($directory)
     {
-        $options = array_merge($this->options, $options);
-
-
-        $folder = $options['file_base_path'] . '/' . $options['folder'];
-
-        if (!strlen(trim($options['file_base_path'])))
-        {
-            throw \Exception("file_base_path option looks empty, bailing out");
-        }
-
-        if (!strlen(trim($options['folder'])))
-        {
-            throw \Exception("folder option looks empty, bailing out");
-        }
-        system("rm -rf " . escapeshellarg($folder));
+        system("rm -rf " . escapeshellarg($directory));
     }
 
     /**
@@ -95,8 +48,6 @@ class FileManager
      */
     public function syncFiles($options = array())
     {
-        $options = array_merge($this->options, $options);
-
         if (!strlen(trim($options['from_folder'])))
         {
             throw \Exception("from_folder option looks empty, bailing out");

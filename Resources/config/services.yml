@@ -63,11 +63,11 @@ services:
     lcn.file_uploader:
         class: Lcn\FileUploaderBundle\Services\FileUploader
         arguments:
-          - file_base_path: '%lcn_file_uploader.file_base_path%'
+          - file_manager: '@lcn.file_uploader_file_manager'
+            file_base_path: '%lcn_file_uploader.file_base_path%'
             web_base_path: '%lcn_file_uploader.web_base_path%'
             temp_file_base_path: '%lcn_file_uploader.temp_file_base_path%'
             temp_web_base_path: '%lcn_file_uploader.temp_web_base_path%'
-            file_manager: '@lcn.file_uploader_file_manager'
             allowed_extensions: '%lcn_file_uploader.allowed_extensions%'
             sizes: '%lcn_file_uploader.sizes%'
             originals: '%lcn_file_uploader.originals%'
@@ -79,10 +79,6 @@ services:
     # something in a command context
     lcn.file_uploader_file_manager:
         class: Lcn\FileUploaderBundle\Services\FileManager
-        arguments:
-          # For bc reasons we're not changing the names of the parameters
-          - file_base_path: '%lcn_file_uploader.file_base_path%'
-            temp_file_base_path: '%lcn_file_uploader.temp_file_base_path%'
 
     lcn.twig.file_extension:
         class: Lcn\FileUploaderBundle\Twig\FileUploaderExtension

@@ -2,19 +2,22 @@
 
 namespace Lcn\FileUploaderBundle\Services;
 
-use Symfony\Component\HttpFoundation\Request;
-
 class FileUploader
 {
-    protected $options;
 
     /**
-     * @var Request
+     * @var FileManager
      */
-    protected $request;
+    protected $fileManager;
+
+    /**
+     * @var array
+     */
+    protected $options;
 
     public function __construct($options)
     {
+        $this->fileManager = $options['file_manager'];
         $this->options = $options;
     }
 
@@ -50,7 +53,9 @@ class FileUploader
      */
     public function getFilenames($uploadFolderName)
     {
-        return $this->options['file_manager']->getFiles($uploadFolderName);
+        $directory = $this->options['file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getOriginalsFolderName();
+
+        return $this->fileManager->getFiles($directory);
     }
 
     /**
@@ -58,15 +63,19 @@ class FileUploader
      */
     public function getTempFiles($uploadFolderName)
     {
-        return $this->options['file_manager']->getTempFiles($uploadFolderName);
+        $directory = $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getOriginalsFolderName();
+
+        return $this->fileManager->getFiles($directory);
     }
 
     /**
-     * Remove the folder specified by 'folder'
+     * Remove the given folder
      */
-    public function removeFiles($options = array())
+    public function removeFiles($uploadFolderName)
     {
-        $this->options['file_manager']->removeFiles($options);
+        $directory = $this->options['file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName;
+
+        $this->fileManager->removeFiles($directory);
     }
 
     /**
@@ -76,7 +85,7 @@ class FileUploader
      * @return void
      */
     public function syncFilesFromTemp($folderName) {
-        $this->options['file_manager']->syncFiles(array(
+        $this->fileManager->syncFiles(array(
             'from_folder' => $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$folderName,
             'to_folder' => $this->options['file_base_path'].DIRECTORY_SEPARATOR.$folderName,
             'remove_from_folder' => true,
@@ -92,7 +101,7 @@ class FileUploader
      */
     public function syncFilesToTemp($folderName)
     {
-        $this->options['file_manager']->syncFiles(array(
+        $this->fileManager->syncFiles(array(
             'from_folder' => $this->options['file_base_path'].DIRECTORY_SEPARATOR.$folderName,
             'to_folder' => $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$folderName,
             'create_to_folder' => true,
@@ -146,9 +155,7 @@ class FileUploader
             $sizes[$index]['no_cache'] = true;
         }
 
-        $originals = $options['originals'];
-
-        $uploadDir = $tempFilePath . '/' . $originals['folder'] . '/';
+        $uploadDir = $tempFilePath . '/' . $this->getOriginalsFolderName() . '/';
 
         foreach ($sizes as $size)
         {
@@ -160,7 +167,7 @@ class FileUploader
         new \Lcn\FileUploaderBundle\BlueImp\UploadHandler(
             array(
                 'upload_dir' => $uploadDir, 
-                'upload_url' => $tempWebPath . '/' . $originals['folder'] . '/',
+                'upload_url' => $tempWebPath . '/' . $this->getOriginalsFolderName() . '/',
                 'image_versions' => $sizes,
                 'accept_file_types' => $allowedExtensionsRegex,
                 'max_number_of_files' => $options['max_number_of_files'],
@@ -169,6 +176,10 @@ class FileUploader
         // Without this Symfony will try to respond; the BlueImp upload handler class already did,
         // so it's time to hush up
         exit(0);
+    }
+
+    protected function getOriginalsFolderName() {
+        return $this->options['originals']['folder'];
     }
 
     protected function getSizeConfig($size, $key, $default = null) {
