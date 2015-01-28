@@ -11,15 +11,32 @@ class FileManager
         $this->options = $options;
     }
 
+    public function getFiles($uploadFolderName) {
+        $options = array(
+            'folder' => $uploadFolderName,
+            'file_base_path' => $this->options['file_base_path'],
+        );
+
+        return $this->getFilesForOptions($options);
+    }
+
+    public function getTempFiles($uploadFolderName) {
+        $options = array(
+            'folder' => $uploadFolderName,
+            'file_base_path' => $this->options['temp_file_base_path'],
+        );
+
+        return $this->getFilesForOptions($options);
+    }
+
     /**
-     * Get a list of files already present. The 'folder' option is required. 
+     * Get a list of files already present. The 'folder' option is required.
      * If you pass consistent options to this method and handleFileUpload with
      * regard to paths, then you will get consistent results.
      */
-    public function getFiles($options = array())
+    protected function getFilesForOptions($options = array())
     {
         $options = array_merge($this->options, $options);
-
         $folder = $options['file_base_path'] . '/' . $options['folder'];
         if (file_exists($folder))
         {
@@ -80,13 +97,6 @@ class FileManager
     {
         $options = array_merge($this->options, $options);
 
-        // We're syncing and potentially deleting folders, so make sure
-        // we were passed something - make it a little harder to accidentally
-        // trash your site
-        if (!strlen(trim($options['file_base_path'])))
-        {
-            throw \Exception("file_base_path option looks empty, bailing out");
-        }
         if (!strlen(trim($options['from_folder'])))
         {
             throw \Exception("from_folder option looks empty, bailing out");
@@ -96,8 +106,9 @@ class FileManager
             throw \Exception("to_folder option looks empty, bailing out");
         }
 
-        $from = $options['file_base_path'] . '/' . $options['from_folder'];
-        $to = $options['file_base_path'] . '/' . $options['to_folder'];
+        $from = $options['from_folder'];
+        $to = $options['to_folder'];
+
         if (file_exists($from))
         {
             if (isset($options['create_to_folder']) && $options['create_to_folder'])

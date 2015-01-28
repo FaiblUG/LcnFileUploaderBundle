@@ -117,17 +117,22 @@ class DemoController extends Controller
      * In a real world scenario you might want to check edit permissions
      *
      * @param Request $request
-     * @param $userId
+     * @param $entityId
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function createOrEditAction(Request $request, $entityId = null)
     {
         $fileUploader = $this->container->get('lcn.file_uploader');
 
-        $editId = intval($request->get('editId', mt_rand(100000000000, 999999999999)));
-        if ($editId < 100000000000) {
-            throw new \Exception('invalid editId');
+        $editId = intval($entityId);
+        if (empty($editId)) {
+            $editId = intval($request->get('editId', mt_rand(100000000000, 999999999999)));
+            if ($editId < 100000000000) {
+                throw new \Exception('invalid editId');
+            }
         }
+
+        $uploadFolderName = $this->getUploadFolderName($editId);
 
         $form = $this->createFormBuilder()
             ->setAction(($entityId ? $this->generateUrl('lcn_file_uploader_demo_edit', array('entityId'  => $entityId)) : $this->generateUrl('lcn_file_uploader_demo_create')).'?editId='.$editId)
@@ -146,37 +151,24 @@ class DemoController extends Controller
                  */
 
                 if (!$entityId) {
-                    $entityId = mt_rand(100000, 999999); //in a real world scenario you would use the id of your jsut persisted entity
+                    $entityId = $editId; //in a real world scenario you would use the id of your jsut persisted entity
                 }
 
-                $fileUploader->syncFiles(
-                    array(
-                        'from_folder' => $this->getTempUploadFolderNameForEditId($editId),
-                        'to_folder' => $this->getUploadFolderNameForEntityId($entityId),
-                        'remove_from_folder' => true,
-                        'create_to_folder' => true,
-                    )
-                );
+                $fileUploader->syncFilesFromTemp($uploadFolderName);
 
-                return $this->redirect($this->generateUrl('lcn_file_uploader_demo_edit', array('entityId'  => $entityId)));
+                return $this->redirect($this->generateUrl('lcn_file_uploader_demo_show', array('entityId'  => $entityId)));
             }
         } else {
             if ($entityId) {
-                $fileUploader->syncFiles(
-                    array(
-                        'from_folder' => $this->getUploadFolderNameForEntityId($entityId),
-                        'to_folder' => $this->getTempUploadFolderNameForEditId($editId),
-                        'create_to_folder' => true,
-                    )
-                );
+                $fileUploader->syncFilesToTemp($uploadFolderName);
             }
         }
 
-        return $this->render('LcnFileUploaderBundle:Demo:index.html.twig', array(
+        return $this->render('LcnFileUploaderBundle:Demo:edit.html.twig', array(
             'entityId' => $entityId,
             'form' => $form->createView(),
             'uploadUrl' => $this->generateUrl('lcn_file_uploader_demo_handle_file_upload', array('editId'  => $editId)),
-            'tempUploadFolderName' => $this->getTempUploadFolderNameForEditId($editId),
+            'uploadFolderName' => $uploadFolderName,
         ));
     }
 
@@ -201,9 +193,9 @@ class DemoController extends Controller
         }
 
         $this->container->get('lcn.file_uploader')->handleFileUpload(array(
-            'folder' => $this->getTempUploadFolderNameForEditId($editId),
+            'folder' => $this->getUploadFolderName($editId),
             //'max_number_of_files' => 1, //overwrites parameter lcn_file_uploader.max_number_of_files
-            //'allowed_extensions' => array('zip', 'rar', 'tar'), //overwrites parameter lcn_file_uploader.allowed_extensions
+            //'allowed_extensions' => array('zip', 'rar', 'tar', 'gz'), //overwrites parameter lcn_file_uploader.allowed_extensions
             //'sizes' => array('thumbnail' => array('folder' => 'thumbnails', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
         ));
     }
@@ -212,37 +204,40 @@ class DemoController extends Controller
      * Get the upload folder name for the given entity id.
      * This is where the uploaded files will be persisted to.
      *
-     * @param $entityId
+     * @param $id
      * @return string
      */
-    private function getUploadFolderNameForEntityId($entityId)
+    private function getUploadFolderName($id)
     {
-        return 'lcn-file-uploader-demo/' . $entityId;
+        return 'demo/' . $id;
     }
-
-    /**
-     * Get the upload folder name for the given demo user id.
-     * This is where the uploaded files will be stored temporarily
-     * until the user clicks the save button.
-     *
-     * @param $editId
-     * @return string
-     */
-    private function getTempUploadFolderNameForEditId($editId)
-    {
-        return 'temp-lcn-file-uploader-demo/' . $editId;
-    }
-
-}
 ```
 
 #### In Your Layout
 
 Include these stylesheets and scripts in your html document:
 
+```html
     <link rel="stylesheet" href="{{ asset('bundles/lcnfileuploader/dist/main.css') }}">
     <link rel="stylesheet" href="{{ asset('bundles/lcnfileuploader/dist/theme.css') }}">
     <script src="{{ asset('bundles/lcnfileuploader/dist/main.js') }}"></script>
+```
+    
+Or you can use assetic in your twig template:
+
+```twig
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/lcnfileuploader/dist/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/lcnfileuploader/dist/theme.css') }}">
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/lcnfileuploader/dist/main.js') }}"></script>
+{% endblock %}
+```
 
 The exact position and order does not matter. However, for best performance you should include the link tags in your head section and the script tag right before the closing body tag.
 
@@ -268,7 +263,7 @@ Full example:
 
     {% include 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig' with {
         'uploadUrl': uploadUrl,
-        'tempUploadFolderName': tempUploadFolderName,
+        'uploadFolderName': uploadFolderName,
         'formSelector': '#lcn-file-uploader-demo'
     } %}
 
@@ -279,14 +274,69 @@ Full example:
 
 ### Retrieving existing Uploads
 
+#### Retrieve File Names ####
+
 You can easily obtain a list of the names of all files stored in a given folder:
 
-    $fileUploader = $this->container->get('lcn.file_uploader');
-    $files = $fileUploader->getFiles(array('folder' => 'lcn-file-uploader-demo/' . $entity->getId()));
+```php
+$fileUploader = $this->container->get('lcn.file_uploader');
+$filenames = $fileUploader->getFilenames('demo/' . $entity->getId()));
+```
 
 However, there is a performance cost associated with accessing the filesystem.
 If you run into performance problems you might want to keep a list of attachments in a Doctrine table or some cache layer.  
 
+
+#### Retrieve File URLs ####
+
+You can easily obtain a list of urls of all files stored in a given folder:
+
+```php
+$fileUploader = $this->container->get('lcn.file_uploader');
+$fileUrls = $fileUploader->getFileUrls('demo/' . $entity->getId());
+```
+
+However, there is a performance cost associated with accessing the filesystem.
+If you run into performance problems you might want to keep a list of attachments in a Doctrine table or some cache layer.  
+
+
+#### Retrieve Thumbnail URLs ####
+
+If you are dealing with image uploads, you can pass a defined size name:
+
+```php
+$fileUploader = $this->container->get('lcn.file_uploader');
+$fileUrls = $fileUploader->getFileUrls('demo/' . $entity->getId(), 'medium');
+```
+
+The image sizes are defined as lcn_file_uploader.sizes parameter:
+
+```yaml
+  lcn_file_uploader.sizes:
+    thumbnail:
+      folder: thumbnails
+      max_width: 200
+      max_height: 150
+      crop: true
+    small:
+      folder: small
+      max_width: 400
+      max_height: 300
+      crop: true
+    medium:
+      folder: medium
+      max_width: 800
+      max_height: 600
+      crop: true
+    large:
+      folder: large
+      max_width: 1200
+      max_height: 900
+      crop: true
+```
+
+However, there is a performance cost associated with accessing the filesystem.
+If you run into performance problems you might want to keep a list of attachments in a Doctrine table or some cache layer.  
 
 
 ### Advanced Usage

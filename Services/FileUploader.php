@@ -19,39 +19,80 @@ class FileUploader
     }
 
     /**
-     * Get a list of files already present. The 'folder' option is required. 
-     * If you pass consistent options to this method and handleFileUpload with
-     * regard to paths, then you will get consistent results.
+     * Get a list of files prepended by the web base path.
      */
-    public function getFiles($options = array())
+    public function getFileUrls($uploadFolderName, $size = null)
     {
-        return $this->options['file_manager']->getFiles($options);
+        if ($size) {
+            $sizeFolderName = $this->getSizeConfig($size, 'folder');
+        }
+        else {
+            $sizeFolderName = $this->options['originals']['folder'];
+        }
+
+        $urlPrefix = $this->options['web_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR;
+
+        $files = $this->getFilenames($uploadFolderName);
+        foreach ($files as $idx => $file) {
+            $files[$idx] = $urlPrefix.$file;
+        }
+
+        return $files;
+    }
+
+
+    /**
+     * Get a list of files already present.
+     */
+    public function getFilenames($uploadFolderName)
+    {
+        return $this->options['file_manager']->getFiles($uploadFolderName);
     }
 
     /**
-     * Remove the folder specified by 'folder' and its contents.
-     * If you pass consistent options to this method and handleFileUpload with
-     * regard to paths, then you will get consistent results.
+     * Get a list of temporary files.
+     */
+    public function getTempFiles($uploadFolderName)
+    {
+        return $this->options['file_manager']->getTempFiles($uploadFolderName);
+    }
+
+    /**
+     * Remove the folder specified by 'folder'
      */
     public function removeFiles($options = array())
     {
-        return $this->options['file_manager']->removeFiles($options);
+        $this->options['file_manager']->removeFiles($options);
     }
 
     /**
-     * Sync existing files from one folder to another. The 'fromFolder' and 'toFolder'
-     * options are required. As with the 'folder' option elsewhere, these are appended
-     * to the file_base_path for you, missing parent folders are created, etc. If 
-     * 'fromFolder' does not exist no error is reported as this is common if no files
-     * have been uploaded. If there are files and the sync reports errors an exception
-     * is thrown.
-     * 
-     * If you pass consistent options to this method and handleFileUpload with
-     * regard to paths, then you will get consistent results.
+     * Sync files from one temp folder to original folder
+     *
+     * @param $folderName
+     * @return void
      */
-    public function syncFiles($options = array())
+    public function syncFilesFromTemp($folderName) {
+        $this->options['file_manager']->syncFiles(array(
+            'from_folder' => $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$folderName,
+            'to_folder' => $this->options['file_base_path'].DIRECTORY_SEPARATOR.$folderName,
+            'remove_from_folder' => true,
+            'create_to_folder' => true,
+        ));
+    }
+
+    /**
+     * Sync existing files from one original folder to temp folder
+     *
+     * @param $folderName
+     * @return void
+     */
+    public function syncFilesToTemp($folderName)
     {
-        return $this->options['file_manager']->syncFiles($options);
+        $this->options['file_manager']->syncFiles(array(
+            'from_folder' => $this->options['file_base_path'].DIRECTORY_SEPARATOR.$folderName,
+            'to_folder' => $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$folderName,
+            'create_to_folder' => true,
+        ));
     }
 
     /**
@@ -62,7 +103,7 @@ class FileUploader
      * $id = $this->getRequest()->get('id');
      * // Validate the id, make sure it's just an integer, validate the user's right to edit that 
      * // object, then...
-     * $this->get('lcn.file_upload').handleFileUpload(array('folder' => 'photos/' . $id))
+     * $this->get('lcn.file_uploader').handleFileUpload(array('folder' => 'photos/' . $id))
      * 
      * DOES NOT RETURN. The response is generated in native PHP by BlueImp's UploadHandler class.
      *
@@ -91,19 +132,19 @@ class FileUploader
 
         $sizes = (isset($options['sizes']) && is_array($options['sizes'])) ? $options['sizes'] : array();
 
-        $filePath = $options['file_base_path'] . '/' . $options['folder'];
-        $webPath = $options['web_base_path'] . '/' . $options['folder'];
+        $tempFilePath = $options['temp_file_base_path'] . '/' . $options['folder'];
+        $tempWebPath = $options['temp_web_base_path'] . '/' . $options['folder'];
 
         foreach ($sizes as $index => $size)
         {
-            $sizes[$index]['upload_dir'] = $filePath . '/' . $size['folder'] . '/';
-            $sizes[$index]['upload_url'] = $webPath . '/' . $size['folder'] . '/';
+            $sizes[$index]['upload_dir'] = $tempFilePath . '/' . $size['folder'] . '/';
+            $sizes[$index]['upload_url'] = $tempWebPath . '/' . $size['folder'] . '/';
             $sizes[$index]['no_cache'] = true;
         }
 
         $originals = $options['originals'];
 
-        $uploadDir = $filePath . '/' . $originals['folder'] . '/';
+        $uploadDir = $tempFilePath . '/' . $originals['folder'] . '/';
 
         foreach ($sizes as $size)
         {
@@ -112,10 +153,10 @@ class FileUploader
 
         @mkdir($uploadDir, 0777, true);
 
-        $upload_handler = new \Lcn\FileUploaderBundle\BlueImp\UploadHandler(
+        new \Lcn\FileUploaderBundle\BlueImp\UploadHandler(
             array(
                 'upload_dir' => $uploadDir, 
-                'upload_url' => $webPath . '/' . $originals['folder'] . '/',
+                'upload_url' => $tempWebPath . '/' . $originals['folder'] . '/',
                 'image_versions' => $sizes,
                 'accept_file_types' => $allowedExtensionsRegex,
                 'max_number_of_files' => $options['max_number_of_files'],
@@ -124,5 +165,22 @@ class FileUploader
         // Without this Symfony will try to respond; the BlueImp upload handler class already did,
         // so it's time to hush up
         exit(0);
+    }
+
+    protected function getSizeConfig($size, $key, $default = null) {
+        $this->validateSize($size);
+        $sizeConfig = $this->options['sizes'][$size];
+
+        if (array_key_exists($key, $sizeConfig)) {
+            return $sizeConfig[$key];
+        }
+
+        return $default;
+    }
+
+    protected function validateSize($size) {
+        if (!array_key_exists($size, $this->options['sizes'])) {
+            throw new FileUploaderException('Invalid size: '.$size);
+        }
     }
 }

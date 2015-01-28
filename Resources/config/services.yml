@@ -1,7 +1,10 @@
 parameters:
   lcn_file_uploader.max_number_of_files: 100
-  lcn_file_uploader.file_base_path: "%kernel.root_dir%/../web/uploads"
-  lcn_file_uploader.web_base_path: "/uploads"
+  lcn_file_uploader.file_base_path: "%kernel.root_dir%/../web/uploads/lcn-file-uploader"
+  lcn_file_uploader.web_base_path: "/uploads/lcn-file-uploader"
+  lcn_file_uploader.temp_file_base_path: "%kernel.root_dir%/../web/uploads/lcn-file-uploader-temp"
+  lcn_file_uploader.temp_web_base_path: "/uploads/lcn-file-uploader-temp"
+
   lcn_file_uploader.allowed_extensions:
     # Mime types are just for documentation's sake.
     # BlueImp filters by supplied extension. No checking of the
@@ -33,16 +36,7 @@ parameters:
   lcn_file_uploader.originals:
       folder: originals
 
-  # Scaled versions of images. These image sizes are pretty great for
-  # 1140 grid / responsive / bootstrap projects, but you can override as you see fit
-  #
-  # Width and height here are maximums to be enforced, NOT an aspect ratio to be enforced.
-  # UploadHandler renders the smallest size that doesn't violate one of the limits.
-  #
-  # If an original is too small it is simply copied for that particular size. In short,
-  # BlueImp did a good job here.
-  #
-  # You need not specify any sizes if you don't want FileUploader to scale images for you
+  # Define sizes for image uploads
   lcn_file_uploader.sizes:
     thumbnail:
       folder: thumbnails
@@ -71,6 +65,8 @@ services:
         arguments:
           - file_base_path: '%lcn_file_uploader.file_base_path%'
             web_base_path: '%lcn_file_uploader.web_base_path%'
+            temp_file_base_path: '%lcn_file_uploader.temp_file_base_path%'
+            temp_web_base_path: '%lcn_file_uploader.temp_web_base_path%'
             file_manager: '@lcn.file_uploader_file_manager'
             allowed_extensions: '%lcn_file_uploader.allowed_extensions%'
             sizes: '%lcn_file_uploader.sizes%'
@@ -86,9 +82,10 @@ services:
         arguments:
           # For bc reasons we're not changing the names of the parameters
           - file_base_path: '%lcn_file_uploader.file_base_path%'
+            temp_file_base_path: '%lcn_file_uploader.temp_file_base_path%'
 
     lcn.twig.file_extension:
         class: Lcn\FileUploaderBundle\Twig\FileUploaderExtension
-        arguments: [@service_container, %lcn_file_uploader.web_base_path%]
+        arguments: [@service_container, %lcn_file_uploader.temp_web_base_path%]
         tags:
             - { name: twig.extension }

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>LcnFileUploaderBundle Demo and Documentation</title>
+    <link rel="stylesheet" href="{{ asset('bundles/lcnfileuploader/dist/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/lcnfileuploader/dist/theme.css') }}">
+</head>
+<body>
+
+<h1>Demo usage of LcnFileUploaderBundle</h1>
+
+<h2>Show Uploads of temporary entity {{ entityId }}</h2>
+
+<ul>
+{% for uploadedFile in uploadedFiles %}
+    <li><a href="{{ uploadedFile }}" target="_blank">{{ uploadedFile }}</a></li>
+{% endfor %}
+</ul>
+
+
+<a href="{{ path('lcn_file_uploader_demo_edit', { 'entityId': entityId }) }}">Edit files of temporary entity</a></h2>
+
+</body>
+</html>
+

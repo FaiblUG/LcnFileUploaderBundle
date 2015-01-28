@@ -16,9 +16,9 @@
 
     {{ form_errors(form) }}
 
-    {% include widgetTheme with {
+    {% include 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig' with {
         'uploadUrl': uploadUrl,
-        'tempUploadFolderName': tempUploadFolderName,
+        'uploadFolderName': uploadFolderName,
         'formSelector': '#lcn-file-uploader-demo'
     } %}
 
@@ -30,7 +30,7 @@
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
-<script src="{{ asset('bundles/lcnfileuploader/dist/main.js') }}"></script>
+<script src="{{ asset('bundles/lcnfileuploader/dist/main.js') }}" async></script>
 </body>
 </html>
 

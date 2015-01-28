@@ -5,10 +5,10 @@
     window.lcn_file_uploader_queue = window.lcn_file_uploader_queue || [];
     window.lcn_file_uploader_queue.push({
         'uploadUrl': '{{ uploadUrl }}',
-        'viewUrl': '{{ lcn_file_uploader_get_web_path(tempUploadFolderName) }}',
+        'viewUrl': '{{ lcn_file_uploader_get_temp_web_path(uploadFolderName) }}',
         'el': '{{ formSelector }} .file-uploader',
         'maxNumberOfFiles': {{ maxNumberOfFiles|default('null') }},
-        'existingFiles': {{ (lcn_file_uploader_get_files(tempUploadFolderName) | json_encode | raw) }},
+        'existingFiles': {{ (lcn_file_uploader_get_temp_files(uploadFolderName) | json_encode | raw) }},
         'delaySubmitWhileUploading': '{{ formSelector }}'
     });
     </script>
@@ -55,9 +55,9 @@
             <div class="thumbnail-inner"<% if ('undefined' != typeof thumbnailUrl) { %> data-action="replace" title="{{ 'replace_image'|trans }}"<% } %>>
             {# Some things can be thumbnailed, some things not #}
             <% if ('undefined' != typeof thumbnailUrl) { %>
-            <img src="<%- thumbnailUrl %>">
+                <img src="<%- thumbnailUrl %>">
             <% } else { %>
-            <a rel="tooltip" title="{{ 'download_file'|trans }}" class="download thumbnail-action btn" target="download" href="<%- url %>"><%- name %></a>
+                <a title="{{ 'download_file'|trans }}" class="download thumbnail-action btn" target="_blank" href="<%- url %>"><%- name %></a>
             <% } %>
             <span title="{{ 'delete_file'|trans }}" data-action="delete" class="delete">{{ 'delete_file'|trans }}</span>
             </div>

@@ -17,34 +17,34 @@ class FileUploaderExtension extends Twig_Extension
     /**
      * @var string
      */
-    private $webBasePath;
+    private $tempWebBasePath;
 
     /**
      * @param ContainerInterface $container
-     * @param string $webBasePath
+     * @param string $tempWebBasePath
      */
-    public function __construct(ContainerInterface $container, $webBasePath)
+    public function __construct(ContainerInterface $container, $tempWebBasePath)
     {
         $this->uploader = $container->get('lcn.file_uploader');
-        $this->webBasePath = $webBasePath;
+        $this->tempWebBasePath = $tempWebBasePath;
     }
 
     public function getFunctions()
     {
         return array(
-            'lcn_file_uploader_get_files' => new Twig_Function_Method($this, 'getUploadedFiles'),
-            'lcn_file_uploader_get_web_path' => new Twig_Function_Method($this, 'getWebPath'),
+            'lcn_file_uploader_get_temp_files' => new Twig_Function_Method($this, 'getTempFiles'),
+            'lcn_file_uploader_get_temp_web_path' => new Twig_Function_Method($this, 'getTempWebPath'),
         );
     }
 
-    public function getUploadedFiles($folder)
+    public function getTempFiles($uploadFolderName)
     {
-        return $this->uploader->getFiles(array('folder' => $folder));
+        return $this->uploader->getTempFiles($uploadFolderName);
     }
 
-    public function getWebPath($folder)
+    public function getTempWebPath($folder)
     {
-        return $this->webBasePath.'/'.$folder;
+        return $this->tempWebBasePath.'/'.$folder;
     }
 
     public function getName()

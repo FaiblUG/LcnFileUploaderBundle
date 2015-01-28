@@ -10,22 +10,54 @@ class DemoController extends Controller
 {
 
     /**
+     * Show Uploads for the given entity id.
+     *
+     * In a real world scenario you might want to check view permissions
+     *
+     * @param Request $request
+     * @param $entityId
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function showAction(Request $request, $entityId)
+    {
+        $fileUploader = $this->container->get('lcn.file_uploader');
+
+        $entityId = intval($entityId);
+        if ($entityId < 100000000000) {
+            throw new \Exception('invalid editId');
+        }
+
+        $uploadFolderName = $this->getUploadFolderName($entityId);
+        $uploadedFiles = $fileUploader->getFileUrls($uploadFolderName);
+
+        return $this->render('LcnFileUploaderBundle:Demo:show.html.twig', array(
+            'entityId' => $entityId,
+            'uploadedFiles' => $uploadedFiles,
+        ));
+    }
+
+    /**
      * Edit Uploads for the given entity id or create new entity with uploads.
      *
      * In a real world scenario you might want to check edit permissions
      *
      * @param Request $request
-     * @param $userId
+     * @param $entityId
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function createOrEditAction(Request $request, $entityId = null)
     {
         $fileUploader = $this->container->get('lcn.file_uploader');
 
-        $editId = intval($request->get('editId', mt_rand(100000000000, 999999999999)));
-        if ($editId < 100000000000) {
-            throw new \Exception('invalid editId');
+        $editId = intval($entityId);
+        if (empty($editId)) {
+            $editId = intval($request->get('editId', mt_rand(100000000000, 999999999999)));
+            if ($editId < 100000000000) {
+                throw new \Exception('invalid editId');
+            }
         }
+
+        $uploadFolderName = $this->getUploadFolderName($editId);
 
         $form = $this->createFormBuilder()
             ->setAction(($entityId ? $this->generateUrl('lcn_file_uploader_demo_edit', array('entityId'  => $entityId)) : $this->generateUrl('lcn_file_uploader_demo_create')).'?editId='.$editId)
@@ -44,46 +76,24 @@ class DemoController extends Controller
                  */
 
                 if (!$entityId) {
-                    $entityId = mt_rand(100000, 999999); //in a real world scenario you would use the id of your jsut persisted entity
+                    $entityId = $editId; //in a real world scenario you would use the id of your jsut persisted entity
                 }
 
-                $fileUploader->syncFiles(
-                    array(
-                        'from_folder' => $this->getTempUploadFolderNameForEditId($editId),
-                        'to_folder' => $this->getUploadFolderNameForEntityId($entityId),
-                        'remove_from_folder' => true,
-                        'create_to_folder' => true,
-                    )
-                );
+                $fileUploader->syncFilesFromTemp($uploadFolderName);
 
-                return $this->redirect($this->generateUrl('lcn_file_uploader_demo_edit', array('entityId'  => $entityId)));
+                return $this->redirect($this->generateUrl('lcn_file_uploader_demo_show', array('entityId'  => $entityId)));
             }
         } else {
             if ($entityId) {
-                $fileUploader->syncFiles(
-                    array(
-                        'from_folder' => $this->getUploadFolderNameForEntityId($entityId),
-                        'to_folder' => $this->getTempUploadFolderNameForEditId($editId),
-                        'create_to_folder' => true,
-                    )
-                );
+                $fileUploader->syncFilesToTemp($uploadFolderName);
             }
         }
 
-
-        if ($request->query->get('custom_theme')) {
-            $widgetTheme = 'LcnFileUploaderBundle:Demo:lcnFileUploaderWidget.html.twig';
-        }
-        else {
-            $widgetTheme = 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig';
-        }
-
-        return $this->render('LcnFileUploaderBundle:Demo:index.html.twig', array(
+        return $this->render('LcnFileUploaderBundle:Demo:edit.html.twig', array(
             'entityId' => $entityId,
             'form' => $form->createView(),
             'uploadUrl' => $this->generateUrl('lcn_file_uploader_demo_handle_file_upload', array('editId'  => $editId)),
-            'tempUploadFolderName' => $this->getTempUploadFolderNameForEditId($editId),
-            'widgetTheme' => $widgetTheme,
+            'uploadFolderName' => $uploadFolderName,
         ));
     }
 
@@ -108,7 +118,7 @@ class DemoController extends Controller
         }
 
         $this->container->get('lcn.file_uploader')->handleFileUpload(array(
-            'folder' => $this->getTempUploadFolderNameForEditId($editId),
+            'folder' => $this->getUploadFolderName($editId),
             //'max_number_of_files' => 1, //overwrites parameter lcn_file_uploader.max_number_of_files
             //'allowed_extensions' => array('zip', 'rar', 'tar', 'gz'), //overwrites parameter lcn_file_uploader.allowed_extensions
             //'sizes' => array('thumbnail' => array('folder' => 'thumbnails', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
@@ -119,25 +129,12 @@ class DemoController extends Controller
      * Get the upload folder name for the given entity id.
      * This is where the uploaded files will be persisted to.
      *
-     * @param $entityId
+     * @param $id
      * @return string
      */
-    private function getUploadFolderNameForEntityId($entityId)
+    private function getUploadFolderName($id)
     {
-        return 'lcn-file-uploader-demo/' . $entityId;
-    }
-
-    /**
-     * Get the upload folder name for the given demo user id.
-     * This is where the uploaded files will be stored temporarily
-     * until the user clicks the save button.
-     *
-     * @param $editId
-     * @return string
-     */
-    private function getTempUploadFolderNameForEditId($editId)
-    {
-        return 'temp-lcn-file-uploader-demo/' . $editId;
+        return 'demo/' . $id;
     }
 
 }
