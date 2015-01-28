@@ -44,8 +44,20 @@ class FileUploader
     }
 
 
+    public function getFileBasePath() {
+        return $this->options['file_base_path'];
+    }
+
     public function getWebBasePath() {
         return $this->options['web_base_path'];
+    }
+
+    public function getTempFileBasePath() {
+        return $this->options['temp_file_base_path'];
+    }
+
+    public function getTempWebBasePath() {
+        return $this->options['temp_web_base_path'];
     }
 
     /**
@@ -76,6 +88,16 @@ class FileUploader
         $directory = $this->options['file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName;
 
         $this->fileManager->removeFiles($directory);
+    }
+
+    /**
+     * Removes temporary files and folders older than a given minimum age (in minutes)
+     */
+    public function removeOldTemporaryFiles($minAgeInMinutes)
+    {
+        $directory = $this->options['temp_file_base_path'];
+
+        $this->fileManager->removeOldFiles($directory, $minAgeInMinutes);
     }
 
     /**

@@ -93,9 +93,6 @@ To accomplish this for new objects as well as existing objects, we suggest you f
 Note that the editId you generate should be highly random to prevent users from gaining control of each other's attachments.
 
 This code takes care of creating an editId on the first pass through the form and syncs existing files attached to an existing entity, if any.
-The from_folder and to_folder objects specify directory names where the attached files will be stored.
-
-Later we'll look at how the full path to these folders is determined.
 
 Fetching $entity and validating that the user is allowed to edit that particular entity is up to you.
 
@@ -370,72 +367,23 @@ You can do this as follows:
 
 You probably might want to do that in a doctrine lifecycle preRemove event listener.
 
-Removing Temporary Files
-========================
+### Removing Temporary Files
 
-If you choose to follow our editId pattern, you'll want to purge contents of web/uploads/temp-lcn-file-uploader-demo that are over a certain age on a periodic basis. People walk away from websites a lot, so not everyone will click your thoughtfully provided "cancel" action that calls removeFiles() based on the editId pattern.
+You should make sure that the temporary files do not eat up your storage.
 
-Consider installing this shell script as a cron job to be run nightly. This shell script deletes files more than one day old, then deletes empty folders:
+The following Command Removes all temporary uploads older than 120 minutes
 
-    #!/bin/sh
-    find /path/to/my/project/web/uploads/temp-lcn-file-uploader-demo -mtime +1 -type f -delete
-    find /path/to/my/project/web/uploads/temp-lcn-file-uploader-demo -mindepth 1 -type d -empty -delete
+```sh
+app/console lcn:file-uploader:cleanup --min-age-in-minutes=120
+´´´
 
-(Since the second command is not recursive, the parent folders may stick around an extra day, but they are removed the next day.)
+You might want to setup a cronjob that automatically executes that command in a given interval.
 
-Configuration Parameters
-========================
 
-See `Resources/config/services.yml` in this bundle. You can easily decide what the parent folder of uploads will be and what file extensions are accepted, as well as what sizes you'd like image files to be automatically scaled to.
 
-The `from_folder`, `to_folder`, and `folder` options seen above are all appended after `file_uploader.file_base_path` when dealing with files.
+### More Configuration Parameters
 
-If `file_uploader.file_base_path` is set as follows (the default):
-
-    file_uploader.file_base_path: "%kernel.root_dir%/../web/uploads"
-
-And the `folder` option is set to `lcn-file-uploader-demo/5` when calling `handleFileUpload`, then the uploaded files will arrive in:
-
-    /root/of/your/project/web/uploads/lcn-file-uploader-demo/5/originals
-
-If the only attached file for this posting is `botfly.jpg` and you have configured one or more image sizes for the `file_uploader.sizes` option (by default we provide several useful standard sizes), then you will see:
-
-    /root/of/your/project/web/uploads/photos/5/originals/botfly.jpg
-    /root/of/your/project/web/uploads/photos/5/thumbnail/botfly.jpg
-    /root/of/your/project/web/uploads/photos/5/medium/botfly.jpg
-    /root/of/your/project/web/uploads/photos/5/large/botfly.jpg
-
-So all of these can be readily accessed via the following URLs:
-
-    /uploads/photos/5/originals/botfly.jpg
-
-And so on.
-
-The original names and file extensions of the files uploaded are preserved as much as possible without introducing security risks.
-
-Limit number of uploads
------------------------
-
-You can limit the number of uploaded files by setting the `max_no_of_files` property. You could set this in parameters.yml like this:
-
-    parameters:
-      file_uploader.max_number_of_files: 4
-
-You'll probably want to add an error handler for this case. In the template where you initialize LcnFileUploader set `errorCallback`
-
-    // Enable the file uploader
-    $(function() {
-      new LcnFileUploader({
-        // ... other required options,
-
-        'errorCallback': function(errorObj) {
-          if (errorObj.error == 'maxNumberOfFiles') {
-            alert("Maximum uploaded files exceeded!");
-          }
-        }
-      });
-    });
-
+Most of the options can be configured by overriding the parameters defined in `Resources/config/services.yml` in this bundle.
 
 
 Limitations
@@ -445,9 +393,3 @@ This bundle accesses the file system via the `glob()` function. It won't work ou
 
 Syncing files back and forth to follow the editId pattern might not be agreeable if your attachments are very large. In that case, don't use the editId pattern. One alternative is to create objects immediately in the database and not show them in the list view until you mark them live. This way your edit action can use the permanent id of the object as part of the `folder` option, and nothing has to be synced. In this scenario you should probably move the attachments list below the form to hint to the user that there is no such thing as "cancelling" those actions.
 
-Notes
-=====
-
-The uploader has been styled using Bootstrap conventions. If you have Bootstrap in your project, the uploader should look reasonably pretty out of the box.
-
-The "Choose Files" button allows multiple select as well as drag and drop.

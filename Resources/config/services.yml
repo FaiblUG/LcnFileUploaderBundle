@@ -73,15 +73,18 @@ services:
             originals: '%lcn_file_uploader.originals%'
             max_number_of_files: '%lcn_file_uploader.max_number_of_files%'
 
-    # You usually won't need this sub-service directly,
-    # however you can access it from a command, which is
-    # convenient if you need to delete files relating to
-    # something in a command context
     lcn.file_uploader_file_manager:
         class: Lcn\FileUploaderBundle\Services\FileManager
+        public: false
+
+    lcn.file_uploader_cleanup_command:
+        class: Lcn\FileUploaderBundle\Command\CleanupCommand
+        arguments: [@lcn.file_uploader]
+        tags:
+            -  { name: console.command }
 
     lcn.twig.file_extension:
         class: Lcn\FileUploaderBundle\Twig\FileUploaderExtension
-        arguments: [@service_container, %lcn_file_uploader.temp_web_base_path%]
+        arguments: [@lcn.file_uploader]
         tags:
             - { name: twig.extension }

@@ -36,6 +36,17 @@ class FileManager
     }
 
     /**
+     * Remove the given directory
+     *
+     * @param string $uploadFolderName
+     */
+    public function removeOldFiles($directory, $minAgeInMinutes)
+    {
+        system('find '.escapeshellarg($directory).' -mmin +'.escapeshellarg($minAgeInMinutes).' -type f -delete');
+        system('find '.escapeshellarg($directory).' -mindepth 1 -type d -empty -delete');
+    }
+
+    /**
      * Sync existing files from one folder to another. The 'fromFolder' and 'toFolder'
      * options are required. As with the 'folder' option elsewhere, these are appended
      * to the file_base_path for you, missing parent folders are created, etc. If 
