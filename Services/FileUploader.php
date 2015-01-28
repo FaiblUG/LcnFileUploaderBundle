@@ -30,7 +30,7 @@ class FileUploader
             $sizeFolderName = $this->options['originals']['folder'];
         }
 
-        $urlPrefix = $this->options['web_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR;
+        $urlPrefix = $this->getWebBasePath().DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR;
 
         $files = $this->getFilenames($uploadFolderName);
         foreach ($files as $idx => $file) {
@@ -40,6 +40,10 @@ class FileUploader
         return $files;
     }
 
+
+    public function getWebBasePath() {
+        return $this->options['web_base_path'];
+    }
 
     /**
      * Get a list of files already present.
