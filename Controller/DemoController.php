@@ -121,7 +121,7 @@ class DemoController extends Controller
             'folder' => $this->getUploadFolderName($editId),
             //'max_number_of_files' => 1, //overwrites parameter lcn_file_uploader.max_number_of_files
             //'allowed_extensions' => array('zip', 'rar', 'tar', 'gz'), //overwrites parameter lcn_file_uploader.allowed_extensions
-            //'sizes' => array('thumbnail' => array('folder' => 'thumbnails', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
+            //'sizes' => array('thumbnail' => array('folder' => 'thumbnail', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
         ));
     }
 

@@ -193,7 +193,7 @@ class DemoController extends Controller
             'folder' => $this->getUploadFolderName($editId),
             //'max_number_of_files' => 1, //overwrites parameter lcn_file_uploader.max_number_of_files
             //'allowed_extensions' => array('zip', 'rar', 'tar', 'gz'), //overwrites parameter lcn_file_uploader.allowed_extensions
-            //'sizes' => array('thumbnail' => array('folder' => 'thumbnails', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
+            //'sizes' => array('thumbnail' => array('folder' => 'thumbnail', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
         ));
     }
 
@@ -303,37 +303,31 @@ If you are dealing with image uploads, you can pass a defined size name:
 
 ```php
 $fileUploader = $this->container->get('lcn.file_uploader');
-$fileUrls = $fileUploader->getFileUrls('demo/' . $entity->getId(), 'medium');
+$fileUrls = $fileUploader->getFileUrls('demo/' . $entity->getId(), 'thumbnail');
 ```
 
 The image sizes are defined as lcn_file_uploader.sizes parameter:
 
 ```yaml
+  # Define sizes for image uploads
   lcn_file_uploader.sizes:
+    # Depending on your further requirements, you might want to define additional image sizes.
+    # However, more advanced solutions exist for image resampling, e.g.
+    # https://github.com/liip/LiipImagineBundle.
+    
+    # required: "thumbnail" 
     thumbnail:
-      folder: thumbnails
+      folder: thumbnail
       max_width: 200
       max_height: 150
       crop: true
-    small:
-      folder: small
-      max_width: 400
-      max_height: 300
-      crop: true
-    medium:
-      folder: medium
-      max_width: 800
-      max_height: 600
-      crop: true
-    large:
-      folder: large
-      max_width: 1200
-      max_height: 900
-      crop: true
+    # optional: "original" - define original image size if you want to restrict the maximum image dimensions:
+    original:
+      folder: original
+      max_width: 3000
+      max_height: 2000
+      crop: false
 ```
-
-However, there is a performance cost associated with accessing the filesystem.
-If you run into performance problems you might want to keep a list of attachments in a Doctrine table or some cache layer.  
 
 
 ### Advanced Usage

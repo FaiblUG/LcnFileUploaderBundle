@@ -5,6 +5,8 @@
     window.lcn_file_uploader_queue = window.lcn_file_uploader_queue || [];
     window.lcn_file_uploader_queue.push({
         'uploadUrl': '{{ uploadUrl }}',
+        'originalFolderName': '{{ lcn_file_uploader_get_original_folder_name() }}',
+        'thumbnailFolderName': '{{ lcn_file_uploader_get_thumbnail_folder_name() }}',
         'viewUrl': '{{ lcn_file_uploader_get_temp_web_path(uploadFolderName) }}',
         'el': '{{ formSelector }} .file-uploader',
         'maxNumberOfFiles': {{ maxNumberOfFiles|default('null') }},

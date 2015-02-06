@@ -25,9 +25,21 @@ class FileUploaderExtension extends Twig_Extension
     public function getFunctions()
     {
         return array(
+            'lcn_file_uploader_get_original_folder_name' => new Twig_Function_Method($this, 'getOriginalFolderName'),
+            'lcn_file_uploader_get_thumbnail_folder_name' => new Twig_Function_Method($this, 'getThumbnailFolderName'),
             'lcn_file_uploader_get_temp_files' => new Twig_Function_Method($this, 'getTempFiles'),
             'lcn_file_uploader_get_temp_web_path' => new Twig_Function_Method($this, 'getTempWebPath'),
         );
+    }
+
+    public function getOriginalFolderName()
+    {
+        return $this->fileUploader->getOriginalFolderName();
+    }
+
+    public function getThumbnailFolderName()
+    {
+        return $this->fileUploader->getThumbnailFolderName();
     }
 
     public function getTempFiles($uploadFolderName)

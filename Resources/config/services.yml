@@ -33,31 +33,27 @@ parameters:
 
   # Folder where originals are uploaded. This is the only folder populated for
   # uploads that are not images
-  lcn_file_uploader.originals:
-      folder: originals
+  lcn_file_uploader.original:
+      folder: original
 
   # Define sizes for image uploads
   lcn_file_uploader.sizes:
+    # Depending on your further requirements, you might want to define additional image sizes.
+    # However, more advanced solutions exist for image resampling, e.g.
+    # https://github.com/liip/LiipImagineBundle.
+
+    # required: "thumbnail"
     thumbnail:
-      folder: thumbnails
+      folder: thumbnail
       max_width: 200
       max_height: 150
       crop: true
-    small:
-      folder: small
-      max_width: 400
-      max_height: 300
-      crop: true
-    medium:
-      folder: medium
-      max_width: 800
-      max_height: 600
-      crop: true
-    large:
-      folder: large
-      max_width: 1200
-      max_height: 900
-      crop: true
+    # optional: "original" - define original image size if you want to restrict the maximum image dimensions:
+    original:
+      folder: original
+      max_width: 3000
+      max_height: 2000
+      crop: false
 
 services:
     lcn.file_uploader:
@@ -70,7 +66,7 @@ services:
             temp_web_base_path: '%lcn_file_uploader.temp_web_base_path%'
             allowed_extensions: '%lcn_file_uploader.allowed_extensions%'
             sizes: '%lcn_file_uploader.sizes%'
-            originals: '%lcn_file_uploader.originals%'
+            original: '%lcn_file_uploader.original%'
             max_number_of_files: '%lcn_file_uploader.max_number_of_files%'
 
     lcn.file_uploader_file_manager:

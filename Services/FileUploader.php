@@ -30,7 +30,7 @@ class FileUploader
             $sizeFolderName = $this->getSizeConfig($size, 'folder');
         }
         else {
-            $sizeFolderName = $this->options['originals']['folder'];
+            $sizeFolderName = $this->getOriginalFolderName();
         }
 
         $urlPrefix = $this->getWebBasePath().DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR;
@@ -65,7 +65,7 @@ class FileUploader
      */
     public function getFilenames($uploadFolderName)
     {
-        $directory = $this->options['file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getOriginalsFolderName();
+        $directory = $this->options['file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getOriginalFolderName();
 
         return $this->fileManager->getFiles($directory);
     }
@@ -75,7 +75,7 @@ class FileUploader
      */
     public function getTempFiles($uploadFolderName)
     {
-        $directory = $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getOriginalsFolderName();
+        $directory = $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getoriginalFolderName();
 
         return $this->fileManager->getFiles($directory);
     }
@@ -177,7 +177,7 @@ class FileUploader
             $sizes[$index]['no_cache'] = true;
         }
 
-        $uploadDir = $tempFilePath . '/' . $this->getOriginalsFolderName() . '/';
+        $uploadDir = $tempFilePath . '/' . $this->getOriginalFolderName() . '/';
 
         foreach ($sizes as $size)
         {
@@ -189,7 +189,7 @@ class FileUploader
         new \Lcn\FileUploaderBundle\BlueImp\UploadHandler(
             array(
                 'upload_dir' => $uploadDir, 
-                'upload_url' => $tempWebPath . '/' . $this->getOriginalsFolderName() . '/',
+                'upload_url' => $tempWebPath . '/' . $this->getOriginalFolderName() . '/',
                 'image_versions' => $sizes,
                 'accept_file_types' => $allowedExtensionsRegex,
                 'max_number_of_files' => $options['max_number_of_files'],
@@ -200,8 +200,12 @@ class FileUploader
         exit(0);
     }
 
-    protected function getOriginalsFolderName() {
-        return $this->options['originals']['folder'];
+    public function getOriginalFolderName() {
+        return $this->options['original']['folder'];
+    }
+
+    public function getThumbnailFolderName() {
+        return $this->getSizeConfig('thumbnail', 'folder');
     }
 
     protected function getSizeConfig($size, $key, $default = null) {
