@@ -172,12 +172,13 @@ class FileUploader
 
         foreach ($sizes as $index => $size)
         {
-            $sizes[$index]['upload_dir'] = $tempFilePath . '/' . $size['folder'] . '/';
+            $sizes[$index]['upload_dir'] = $tempFilePath . '/' . $size['folder'] . '/';;
             $sizes[$index]['upload_url'] = $tempWebPath . '/' . $size['folder'] . '/';
             $sizes[$index]['no_cache'] = true;
         }
 
-        $uploadDir = $tempFilePath . '/' . $this->getOriginalFolderName() . '/';
+        $uploadDir = $tempFilePath . '/' . $this->getOriginalFolderName() . '/';;
+        $uploadUrl = $tempWebPath . '/' . $this->getOriginalFolderName() . '/';
 
         foreach ($sizes as $size)
         {
@@ -186,10 +187,10 @@ class FileUploader
 
         @mkdir($uploadDir, 0777, true);
 
-        new \Lcn\FileUploaderBundle\BlueImp\UploadHandler(
+        new $this->options['upload_handler_class'](
             array(
                 'upload_dir' => $uploadDir, 
-                'upload_url' => $tempWebPath . '/' . $this->getOriginalFolderName() . '/',
+                'upload_url' => $uploadUrl,
                 'image_versions' => $sizes,
                 'accept_file_types' => $allowedExtensionsRegex,
                 'max_number_of_files' => $options['max_number_of_files'],

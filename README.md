@@ -325,7 +325,7 @@ The image sizes are defined as lcn_file_uploader.sizes parameter:
     original:
       folder: original
       max_width: 3000
-      max_height: 2000
+      max_height: 2250
       crop: false
 ```
 

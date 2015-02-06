@@ -4,6 +4,7 @@ parameters:
   lcn_file_uploader.web_base_path: "/uploads/lcn-file-uploader"
   lcn_file_uploader.temp_file_base_path: "%kernel.root_dir%/../web/uploads/lcn-file-uploader-temp"
   lcn_file_uploader.temp_web_base_path: "/uploads/lcn-file-uploader-temp"
+  lcn_file_uploader.upload_handler.class: "Lcn\FileUploaderBundle\Services\UploadHandler"
 
   lcn_file_uploader.allowed_extensions:
     # Mime types are just for documentation's sake.
@@ -52,7 +53,7 @@ parameters:
     original:
       folder: original
       max_width: 3000
-      max_height: 2000
+      max_height: 2250
       crop: false
 
 services:
@@ -60,6 +61,7 @@ services:
         class: Lcn\FileUploaderBundle\Services\FileUploader
         arguments:
           - file_manager: '@lcn.file_uploader_file_manager'
+            upload_handler_class: '%lcn_file_uploader.upload_handler.class%'
             file_base_path: '%lcn_file_uploader.file_base_path%'
             web_base_path: '%lcn_file_uploader.web_base_path%'
             temp_file_base_path: '%lcn_file_uploader.temp_file_base_path%'
@@ -72,6 +74,7 @@ services:
     lcn.file_uploader_file_manager:
         class: Lcn\FileUploaderBundle\Services\FileManager
         public: false
+
 
     lcn.file_uploader_cleanup_command:
         class: Lcn\FileUploaderBundle\Command\CleanupCommand
