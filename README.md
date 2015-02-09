@@ -374,6 +374,36 @@ app/console lcn:file-uploader:cleanup --min-age-in-minutes=120
 You might want to setup a cronjob that automatically executes that command in a given interval.
 
 
+#### Overriding templates
+
+*** app/Resources/views/Form/lcnFileUploaderWidget.html.twig:
+```twig
+{% extends 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig' %}
+
+{% block lcnFileUploaderWidget %}
+    {# customize as needed #}
+    {{ parent() }}
+{% endblock %}
+
+{% block lcnFileUploaderTemplate %}
+    {# customize as needed #}
+    {{ parent() }}
+{% endblock %}
+
+{% block lcnFileUploaderFileTemplate %}
+    {# customize as needed #}
+    {{ parent() }}
+{% endblock %}
+´´´
+
+*** in your edit.html.twig:
+{% include ':Form:lcnFileUploaderWidget.html.twig' with {
+    'uploadUrl': uploadUrl,
+    'uploadFolderName': uploadFolderName,
+    'formSelector': '#lcn-file-uploader-demo'
+} %}
+
+
 
 ### More Configuration Parameters
 
