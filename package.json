@@ -2,7 +2,7 @@
   "name": "lcn-file-uploader-bundle",
   "version": "1.0.0",
   "private": true,
-  "description": "Easy ajax file uploads for Symfony 2",
+  "description": "Easy ajax file uploads for Symfony2",
   "main": "Resources/public/dist/lcn-file-uploader-bundle.js",
   "devDependencies": {
     "gulp": "~3.8",

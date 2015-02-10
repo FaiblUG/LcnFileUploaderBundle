@@ -1,13 +1,13 @@
 {
   "name" : "locaine/lcn-file-uploader-bundle",
-  "description" : "Easy ajax file uploads for Symfony 2",
+  "description" : "Easy ajax file uploads for Symfony2",
   "type" : "symfony-bundle",
   "authors" : [{
     "name" : "Jonas Fischer-Maeck",
     "email" : "info@jonasfischer.net"
   }],
   "keywords" : [
-    "Symfony 2",
+    "Symfony2",
     "Ajax",
     "File Upload"
   ],
