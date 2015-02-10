@@ -1,6 +1,7 @@
 {% trans_default_domain "lcn_file_uploader_bundle" %}
 {% block lcnFileUploaderWidget %}
 {% spaceless %}
+    {{ lcn_file_uploader_include_assets() }}
     <script>
     window.lcn_file_uploader_queue = window.lcn_file_uploader_queue || [];
     window.lcn_file_uploader_queue.push({

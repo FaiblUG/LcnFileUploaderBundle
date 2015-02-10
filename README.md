@@ -85,16 +85,14 @@ Usage
 
 #### Controller Code
 
-Let's assume you have an editAction() method in a controller.
-In this action you have a form in which you would like to include a list of attached files that work like other fields in the form: you can add and remove files but nothing permanent happens unless the user clicks "save".
+If you need to upload files to not yet persisted entities (during creation) then you need to 
+deal with temporary editIds which makes things a little bit more complicated.
 
-The LcnFileUploader needs a unique folder for the files attached to a given object.
-To accomplish this for new objects as well as existing objects, we suggest you follow the "editId pattern", in which a form is assigned a unique, random "editId" for its entire lifetime, including multiple passes of validation if necessary. This allows us to manage file uploads for new objects that don't have their own id yet.
-Note that the editId you generate should be highly random to prevent users from gaining control of each other's attachments.
+In this example, we assume that you want to attach one or more uploaded image files to an existing entity.
 
-This code takes care of creating an editId on the first pass through the form and syncs existing files attached to an existing entity, if any.
+The LcnFileUploader needs a unique folder for the files attached to a given entity.
 
-Fetching $entity and validating that the user is allowed to edit that particular entity is up to you.
+***Fetching $entity and validating that the user is allowed to edit that particular entity is up to you.***
 
 ```php  
 <?php
@@ -107,9 +105,10 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DemoController extends Controller
 {
-
+    ...
+    
     /**
-     * Edit Uploads for the given entity id or create new entity with uploads.
+     * Edit Uploads for the given entity id
      *
      * In a real world scenario you might want to check edit permissions
      *
@@ -117,54 +116,37 @@ class DemoController extends Controller
      * @param $entityId
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function createOrEditAction(Request $request, $entityId = null)
+    public function editAction(Request $request, $entityId)
     {
-        $fileUploader = $this->container->get('lcn.file_uploader');
-
         $editId = intval($entityId);
-        if (empty($editId)) {
-            $editId = intval($request->get('editId', mt_rand(100000000000, 999999999999)));
-            if ($editId < 100000000000) {
-                throw new \Exception('invalid editId');
-            }
+        if ($editId < 100000000000) {
+            throw new \Exception('invalid editId');
         }
 
+        $fileUploader = $this->container->get('lcn.file_uploader');
         $uploadFolderName = $this->getUploadFolderName($editId);
 
         $form = $this->createFormBuilder()
-            ->setAction(($entityId ? $this->generateUrl('lcn_file_uploader_demo_edit', array('entityId'  => $entityId)) : $this->generateUrl('lcn_file_uploader_demo_create')).'?editId='.$editId)
+            ->setAction($this->generateUrl('lcn_file_uploader_demo_edit', array('entityId'  => $entityId)))
             ->setMethod('POST')
-            ->add('save', 'submit')
-            ->add('editId', 'hidden')
             ->getForm();
 
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
 
             if ($form->isValid()) {
-
-                /**
-                 * In a real world scenario you would probably also persist the changes to your entity ...
-                 */
-
-                if (!$entityId) {
-                    $entityId = $editId; //in a real world scenario you would use the id of your jsut persisted entity
-                }
-
                 $fileUploader->syncFilesFromTemp($uploadFolderName);
 
                 return $this->redirect($this->generateUrl('lcn_file_uploader_demo_show', array('entityId'  => $entityId)));
             }
         } else {
-            if ($entityId) {
-                $fileUploader->syncFilesToTemp($uploadFolderName);
-            }
+            $fileUploader->syncFilesToTemp($uploadFolderName);
         }
 
         return $this->render('LcnFileUploaderBundle:Demo:edit.html.twig', array(
             'entityId' => $entityId,
             'form' => $form->createView(),
-            'uploadUrl' => $this->generateUrl('lcn_file_uploader_demo_handle_file_upload', array('editId'  => $editId)),
+            'uploadUrl' => $this->generateUrl('lcn_file_uploader_demo_handle_file_upload', array('entityId' => $entityId)),
             'uploadFolderName' => $uploadFolderName,
         ));
     }
@@ -182,15 +164,15 @@ class DemoController extends Controller
      * @param Request $request
      * @param int $userId
      */
-    public function handleFileUploadAction(Request $request, $editId)
+    public function handleFileUploadAction(Request $request, $entityId)
     {
-        $editId = intval($editId);
-        if ($editId < 100000000000) {
-            throw new AccessDeniedHttpException('Invalid edit id: '.$editId);
+        $entityId = intval($entityId);
+        if ($entityId < 100000000000) {
+            throw new AccessDeniedHttpException('Invalid edit id: '.$entityId);
         }
 
         $this->container->get('lcn.file_uploader')->handleFileUpload(array(
-            'folder' => $this->getUploadFolderName($editId),
+            'folder' => $this->getUploadFolderName($entityId),
             //'max_number_of_files' => 1, //overwrites parameter lcn_file_uploader.max_number_of_files
             //'allowed_extensions' => array('zip', 'rar', 'tar', 'gz'), //overwrites parameter lcn_file_uploader.allowed_extensions
             //'sizes' => array('thumbnail' => array('folder' => 'thumbnail', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
@@ -208,9 +190,15 @@ class DemoController extends Controller
     {
         return 'demo/' . $id;
     }
+    
+    ...
+}
 ```
 
 #### In Your Layout
+
+***You can skip this step if you are using [LcnIncludeAssetsBundle](https://github.com/FaiblUG/LcnIncludeAssetsBundle).***
+
 
 Include these stylesheets and scripts in your html document:
 
