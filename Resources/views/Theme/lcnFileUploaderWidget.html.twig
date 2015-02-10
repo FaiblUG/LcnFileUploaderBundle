@@ -2,6 +2,7 @@
 {% block lcnFileUploaderWidget %}
 {% spaceless %}
     {{ lcn_file_uploader_include_assets() }}
+    {% set widgetId = lcn_file_uploader_get_unique_widget_id() %}
     <script>
     window.lcn_file_uploader_queue = window.lcn_file_uploader_queue || [];
     window.lcn_file_uploader_queue.push({
@@ -9,13 +10,13 @@
         'originalFolderName': '{{ lcn_file_uploader_get_original_folder_name() }}',
         'thumbnailFolderName': '{{ lcn_file_uploader_get_thumbnail_folder_name() }}',
         'viewUrl': '{{ lcn_file_uploader_get_temp_web_path(uploadFolderName) }}',
-        'el': '{{ formSelector }} .file-uploader',
+        'el': '#{{ widgetId }}',
         'maxNumberOfFiles': {{ maxNumberOfFiles|default('null') }},
         'existingFiles': {{ (lcn_file_uploader_get_temp_files(uploadFolderName) | json_encode | raw) }},
         'delaySubmitWhileUploading': '{{ formSelector }}'
     });
     </script>
-    <div class="file-uploader"></div>
+    <div class="file-uploader" id="{{ widgetId }}"></div>
 {% endspaceless %}
 {% endblock %}
 
