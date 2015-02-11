@@ -41,7 +41,7 @@
                 <div class="error" data-role="error-message"></div>
 
                 {# No name attribute please, that would cause it to submit with a regular form #}
-                <div class="file-input-wrapper" data-role="file-input-wrapper">
+                <div class="file-input-wrapper" data-role="file-input-wrapper" data-replace-text="{{ 'replace_image'|trans }}">
                     <input type="file" title="{{ 'choose_file'|trans }}"<% if (multiple) { %> multiple<% } %>>
                 </div>
 
@@ -56,7 +56,7 @@
     {% spaceless %}
         {# parameters to underscore template: name, thumbnail_url, original_url #}
         <li class="thumbnail" data-name="<%- name %>">
-            <div class="thumbnail-inner"<% if ('undefined' != typeof thumbnailUrl) { %> data-action="replace" title="{{ 'replace_image'|trans }}"<% } %>>
+            <div class="thumbnail-inner"<% if ('undefined' != typeof thumbnailUrl) { %> data-action="replace"<% } %>>
             {# Some things can be thumbnailed, some things not #}
             <% if ('undefined' != typeof thumbnailUrl) { %>
                 <img src="<%- thumbnailUrl %>">

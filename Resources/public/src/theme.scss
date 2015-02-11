@@ -47,25 +47,24 @@ $loading-indicator-color: #007ba0 !default;
         display: block;
         padding: 5px;
 
-        width: 50%;
-        min-width: 100px;
-        max-width: 200px;
+        width: auto;
+        max-width: 50%;
 
         @media (min-width: 37.5em) {
-            width: 33%;
+            max-width: 33%;
         }
 
         @media (min-width: 48em) {
-            width: 20%;
+            max-width: 20%;
         }
 
         @media (min-width: 64em) {
-            width: 15.5%;
+            max-width: 15.5%;
         }
 
         img {
-            width: 100%;
             height: auto;
+            width: 100%;
         }
 
         .download {
@@ -103,7 +102,8 @@ $loading-indicator-color: #007ba0 !default;
     .file-input-wrapper.mode-replace:hover {
         background: rgba(255, 255, 255, 0.7);
         &:before {
-            content: 'Replace File';
+            content: 'replace image';
+            content: attr(data-replace-text);
             position: absolute;
             top: 50%;
             margin-top: -1em;
