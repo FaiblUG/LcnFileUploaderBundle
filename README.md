@@ -384,7 +384,7 @@ services:
 
 #### Overriding templates
 
-*** app/Resources/views/Form/lcnFileUploaderWidget.html.twig:
+*** app/Resources/views/Form/lcnFileUploaderWidget.html.twig: ***
 ```twig
 {% extends 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig' %}
 
@@ -404,7 +404,7 @@ services:
 {% endblock %}
 ´´´
 
-*** in your edit.html.twig:
+*** in your edit.html.twig: ***
 {% include ':Form:lcnFileUploaderWidget.html.twig' with {
     'uploadUrl': uploadUrl,
     'uploadFolderName': uploadFolderName,
