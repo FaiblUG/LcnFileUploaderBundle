@@ -357,12 +357,11 @@ The following Command Removes all temporary uploads older than 120 minutes
 
 ```sh
 app/console lcn:file-uploader:cleanup --min-age-in-minutes=120
-´´´
+```
 
 You might want to setup a cronjob that automatically executes that command in a given interval.
 
-
-#### Cahnging the generated file names
+#### Changing the generated file names
 
 This Bundle comes with three predefined FileNamer-Services:
 
