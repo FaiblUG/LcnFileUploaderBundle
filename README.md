@@ -92,7 +92,7 @@ In this example, we assume that you want to attach one or more uploaded image fi
 
 The LcnFileUploader needs a unique folder for the files attached to a given entity.
 
-***Fetching $entity and validating that the user is allowed to edit that particular entity is up to you.***
+**Fetching $entity and validating that the user is allowed to edit that particular entity is up to you.**
 
 ```php  
 <?php
@@ -197,7 +197,7 @@ class DemoController extends Controller
 
 #### In Your Layout
 
-***You can skip this step if you are using [LcnIncludeAssetsBundle](https://github.com/FaiblUG/LcnIncludeAssetsBundle).***
+**You can skip this step if you are using [LcnIncludeAssetsBundle](https://github.com/FaiblUG/LcnIncludeAssetsBundle).**
 
 
 Include these stylesheets and scripts in your html document:
@@ -324,14 +324,14 @@ The image sizes are defined as lcn_file_uploader.sizes parameter:
 
 You can specify custom file types to divert from the default ones (which are defined in Resources/config/services.yml) by either specifying them in your handleFileUploadAction method or in parameters.yml.
 
-***Per Widget in corresponding handleFileUploadAction:***
+**Per Widget in corresponding handleFileUploadAction:**
     $this->get('lcn.file_uploader')->handleFileUpload(array(
         'folder' => 'temp-lcn-file-uploader-demo/' . $editId,
         'allowed_extensions' => array('zip', 'rar', 'tar')
     ));
 
 
-***Globally in parameters.yml:***
+**Globally in parameters.yml:**
 If you have the Symfony standard edition installed you can specify them in app/config/parameters.yml:
 
     file_uploader.allowed_extensions:
@@ -384,7 +384,7 @@ services:
 
 #### Overriding templates
 
-*** app/Resources/views/Form/lcnFileUploaderWidget.html.twig: ***
+**app/Resources/views/Form/lcnFileUploaderWidget.html.twig:**
 ```twig
 {% extends 'LcnFileUploaderBundle:Theme:lcnFileUploaderWidget.html.twig' %}
 
@@ -402,9 +402,9 @@ services:
     {# customize as needed #}
     {{ parent() }}
 {% endblock %}
-´´´
+```
 
-*** in your edit.html.twig: ***
+**in your edit.html.twig:**
 {% include ':Form:lcnFileUploaderWidget.html.twig' with {
     'uploadUrl': uploadUrl,
     'uploadFolderName': uploadFolderName,
