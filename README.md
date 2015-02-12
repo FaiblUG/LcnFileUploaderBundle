@@ -362,6 +362,26 @@ app/console lcn:file-uploader:cleanup --min-age-in-minutes=120
 You might want to setup a cronjob that automatically executes that command in a given interval.
 
 
+#### Cahnging the generated file names
+
+This Bundle comes with three predefined FileNamer-Services:
+
+ * Sanitize: Make file names url-friendly (Default)
+ * Original: Use original file names as uploaded
+ * Hash: generate hash based on the original filename
+
+You can define the FileNamer in the service definition:
+
+```yaml
+...
+services:
+    lcn.file_uploader:
+        class: Lcn\FileUploaderBundle\Services\FileUploader
+        arguments:
+          - file_namer: '@lcn.file_uploader_file_namer_sanitize'
+          ...
+```
+
 #### Overriding templates
 
 *** app/Resources/views/Form/lcnFileUploaderWidget.html.twig:

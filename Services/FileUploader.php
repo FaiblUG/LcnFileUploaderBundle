@@ -189,6 +189,7 @@ class FileUploader
 
         new $this->options['upload_handler_class'](
             array(
+                'file_namer' => $options['file_namer'],
                 'upload_dir' => $uploadDir, 
                 'upload_url' => $uploadUrl,
                 'image_versions' => $sizes,
