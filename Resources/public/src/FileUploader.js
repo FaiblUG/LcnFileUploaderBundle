@@ -6,6 +6,7 @@ var LcnFileUploader = (function($) {
     ;
 
   function LcnFileUploader(options) {
+    this.options = options;
     this.viewUrl = options.viewUrl;
     this.uploadUrl = options.uploadUrl;
     this.originalFolderName = options.originalFolderName;
@@ -62,6 +63,12 @@ var LcnFileUploader = (function($) {
         }
       }.bind(this))
       .on('fileuploadfail', this.showErrors.bind(this))
+      .on('click', '[data-action="delete"]', function (e) {
+        this.hideErrors();
+        var $file = $(e.currentTarget).closest('[data-name]');
+        this.deleteFile($file);
+        e.preventDefault();
+      }.bind(this));
     ;
 
     this.$el.on('mouseenter', '[data-action="replace"], [data-action="add"], [data-role="file-input-wrapper"]', function (e) {
@@ -107,6 +114,15 @@ var LcnFileUploader = (function($) {
 
     getFileInputWrapper: function() {
       return this.getFileInputElement().closest('[data-role="file-input-wrapper"]');
+    },
+
+    checkMaxNumberOfFilesLimit: function() {
+      if (this.options.maxNumberOfFiles && this.$el.find('[data-uploaded-file]').length >= this.options.maxNumberOfFiles) {
+        this.$el.addClass('max-files-limit-reached');
+      }
+      else {
+        this.$el.removeClass('max-files-limit-reached');
+      }
     },
 
     positionInputOverlay: function($el) {
@@ -191,25 +207,24 @@ var LcnFileUploader = (function($) {
         return;
       }
 
-      var li = $(fileTemplate(info));
-      li.find('[data-action="delete"]').click(function (e) {
-        this.hideErrors();
-        var $file = $(e.currentTarget).closest('[data-name]');
-        this.deleteFile($file);
-        e.preventDefault();
-      }.bind(this));
-
-      this.$thumbnails.append(li);
+      this.$thumbnails.append($(fileTemplate(info)));
+      this.checkMaxNumberOfFilesLimit();
     },
 
     deleteFile: function($file) {
+      $file.hide();
+      this.positionInputOverlay(this.$add);
       var name = $file.attr('data-name');
       return $.ajax({
         type: 'delete',
         url: this.setQueryParameter(this.uploadUrl, 'file', name),
         success: function () {
           $file.remove();
-        },
+          this.checkMaxNumberOfFilesLimit();
+        }.bind(this),
+        error: function() {
+          $file.show();
+        }.bind(this),
         dataType: 'json'
       });
     },

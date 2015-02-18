@@ -32,6 +32,12 @@ $loading-indicator-color: #007ba0 !default;
         color: $error-color;
     }
 
+    &.max-files-limit-reached {
+        [data-action="add"] {
+            display: none;
+        }
+    }
+
     .thumbnails {
         list-style-type: none;
         margin: 1em 0 0 0;

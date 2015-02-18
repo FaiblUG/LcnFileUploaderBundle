@@ -55,7 +55,7 @@
     {% block lcnFileUploaderFileTemplate %}
     {% spaceless %}
         {# parameters to underscore template: name, thumbnail_url, original_url #}
-        <li class="thumbnail" data-name="<%- name %>">
+        <li class="thumbnail" data-name="<%- name %>" data-uploaded-file>
             <div class="thumbnail-inner"<% if ('undefined' != typeof thumbnailUrl) { %> data-action="replace"<% } %>>
             {# Some things can be thumbnailed, some things not #}
             <% if ('undefined' != typeof thumbnailUrl) { %>
