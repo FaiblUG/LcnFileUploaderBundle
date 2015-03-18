@@ -75,7 +75,7 @@ class FileUploader
      */
     public function getTempFiles($uploadFolderName)
     {
-        $directory = $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getoriginalFolderName();
+        $directory = $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getOriginalFolderName();
 
         return $this->fileManager->getFiles($directory);
     }
