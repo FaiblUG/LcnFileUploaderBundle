@@ -6,6 +6,7 @@ var sass = require('gulp-sass');
 var minifyCSS = require('gulp-minify-css');
 var prefix = require('gulp-autoprefixer');
 var rename = require('gulp-rename');
+var gzip = require('gulp-gzip');
 
 var publicPath = 'Resources/public';
 var srcPath = publicPath + '/src';
@@ -27,7 +28,10 @@ gulp.task('scripts', function() {
 
   stream
     .pipe(concat('main.js'))
-    .pipe(gulp.dest(distPath));
+    .pipe(gulp.dest(distPath))
+    .pipe(gzip())
+    .pipe(gulp.dest(distPath))
+  ;
 
   return stream;
 });
@@ -46,7 +50,10 @@ gulp.task('styles', function() {
   }
 
   stream
-    .pipe(gulp.dest(distPath));
+    .pipe(gulp.dest(distPath))
+    .pipe(gzip())
+    .pipe(gulp.dest(distPath))
+  ;
 
   return stream;
 });
