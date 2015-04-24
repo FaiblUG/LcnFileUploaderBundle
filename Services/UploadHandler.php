@@ -3,6 +3,8 @@
 namespace Lcn\FileUploaderBundle\Services;
 
 
+use Lcn\FileUploaderBundle\Exception\FileUploaderException;
+
 class UploadHandler extends \Lcn\FileUploaderBundle\BlueImp\UploadHandler
 {
     /**
@@ -25,8 +27,15 @@ class UploadHandler extends \Lcn\FileUploaderBundle\BlueImp\UploadHandler
     protected function get_file_name($file_path, $name, $size, $type, $error, $index, $content_range) {
         $name = $this->trim_file_name($file_path, $name, $size, $type, $error, $index, $content_range);
 
-        if (array_key_exists('file_namer', $this->options) && $this->options['file_namer'] instanceof FileNamerInterface) {
-            $name = $this->options['file_namer']->getFilename($name);
+        if (array_key_exists('file_namers', $this->options) && is_array($this->options['file_namers'])) {
+            foreach($this->options['file_namers'] as $fileNamer) {
+                if ($fileNamer instanceof FileNamerInterface) {
+                    $name = $fileNamer->getFilename($name);
+                }
+                else {
+                    throw new FileUploaderException('All file namers must implement the FileNamerInterface');
+                }
+            }
         }
 
         return $this->get_unique_filename(

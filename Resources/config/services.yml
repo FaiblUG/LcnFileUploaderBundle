@@ -63,7 +63,7 @@ services:
     lcn.file_uploader:
         class: Lcn\FileUploaderBundle\Services\FileUploader
         arguments:
-          - file_namer: '@lcn.file_uploader_file_namer_sanitize'
+          - file_namers: ['@lcn.file_uploader_file_namer_cache_buster', '@lcn.file_uploader_file_namer_hash']
             file_manager: '@lcn.file_uploader_file_manager'
             upload_handler_class: '%lcn_file_uploader.upload_handler.class%'
             file_base_path: '%lcn_file_uploader.file_base_path%'
@@ -90,6 +90,10 @@ services:
     lcn.file_uploader_file_namer_hash:
         class: Lcn\FileUploaderBundle\Services\FileNamerHash
         arguments: [%secret%]
+        public: false
+
+    lcn.file_uploader_file_namer_cache_buster:
+        class: Lcn\FileUploaderBundle\Services\FileNamerCacheBuster
         public: false
 
     lcn.file_uploader_cleanup_command:

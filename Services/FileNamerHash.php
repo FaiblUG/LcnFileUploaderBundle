@@ -33,19 +33,19 @@ class FileNamerHash implements FileNamerInterface
             unset($filenameParts[count($filenameParts) - 1]);
             $basename = implode('-', $filenameParts);
 
-            return md5($basename).'.'.$extension;
+            return md5($basename.$this->getSalt()).'.'.$extension;
         }
 
 
-        return md5($filename);
+        return md5($filename.$this->getSalt());
     }
 
     /**
      * @param string $value
      * @return string
      */
-    protected function getSalt($value) {
-        return md5($this->salt.$value);
+    protected function getSalt() {
+        return $this->salt;
     }
 
 }
