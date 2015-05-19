@@ -195,6 +195,7 @@ class FileUploader
                 'image_versions' => $sizes,
                 'accept_file_types' => $allowedExtensionsRegex,
                 'max_number_of_files' => $options['max_number_of_files'],
+                'max_file_size' => $options['max_file_size'],
             ));
 
         // Without this Symfony will try to respond; the BlueImp upload handler class already did,

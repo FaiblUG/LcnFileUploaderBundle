@@ -1,5 +1,6 @@
 parameters:
   lcn_file_uploader.max_number_of_files: 100
+  lcn_file_uploader.max_file_size: null #max file size in bytes. if set to null or omitted, system settings (e.g. php.ini) will be used
   lcn_file_uploader.file_base_path: "%kernel.root_dir%/../web/uploads/lcn-file-uploader"
   lcn_file_uploader.web_base_path: "/uploads/lcn-file-uploader"
   lcn_file_uploader.temp_file_base_path: "%kernel.root_dir%/../web/uploads/lcn-file-uploader-temp"
@@ -74,6 +75,7 @@ services:
             sizes: '%lcn_file_uploader.sizes%'
             original: '%lcn_file_uploader.original%'
             max_number_of_files: '%lcn_file_uploader.max_number_of_files%'
+            max_file_size: '%lcn_file_uploader.max_file_size%'
 
     lcn.file_uploader_file_manager:
         class: Lcn\FileUploaderBundle\Services\FileManager

@@ -44,7 +44,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```bash
-$ composer require locaine/lcn-file-uploader-bundle "~1.0"
+$ composer require locaine/lcn-file-uploader-bundle "~1.1"
 ```
 
 This command requires you to have Composer installed globally, as explained
@@ -174,6 +174,7 @@ class DemoController extends Controller
         $this->container->get('lcn.file_uploader')->handleFileUpload(array(
             'folder' => $this->getUploadFolderName($entityId),
             //'max_number_of_files' => 1, //overwrites parameter lcn_file_uploader.max_number_of_files
+            //'max_file_size' => null //overwrites parameter lcn_file_uploader.max file size
             //'allowed_extensions' => array('zip', 'rar', 'tar', 'gz'), //overwrites parameter lcn_file_uploader.allowed_extensions
             //'sizes' => array('thumbnail' => array('folder' => 'thumbnail', 'max_width' => 100, 'max_height' => 100, 'crop' => true), 'profile' => array('folder' => 'profile', 'max_width' => 400, 'max_height' => 400, 'crop' => true)), //overwrites parameter lcn_file_uploader.sizes
         ));
