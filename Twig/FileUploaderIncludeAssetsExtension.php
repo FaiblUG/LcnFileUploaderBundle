@@ -44,8 +44,8 @@ class FileUploaderIncludeAssetsExtension extends Twig_Extension
     {
         if ($this->includeAssets) {
             $this->includeAssets->useJavascript($this->jsMain);
-            $this->includeAssets->useStylesheetAsync($this->cssMain);
-            $this->includeAssets->useStylesheetAsync($this->cssTheme);
+            $this->includeAssets->useStylesheet($this->cssMain, 'middle', true);
+            $this->includeAssets->useStylesheet($this->cssTheme, 'middle', true);
         }
     }
 
