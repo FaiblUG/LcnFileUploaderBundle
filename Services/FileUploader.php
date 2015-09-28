@@ -2,6 +2,8 @@
 
 namespace Lcn\FileUploaderBundle\Services;
 
+use Lcn\FileUploaderBundle\Exception\FileUploaderException;
+
 class FileUploader
 {
 
@@ -22,25 +24,87 @@ class FileUploader
     }
 
     /**
-     * Get a list of files prepended by the web base path.
+     * Get a list of file urls for the files in the given upload folder and for the given image size (optional)
+     *
+     * @param string $uploadFolderName
+     * @param string|null $size
+     * @return array
      */
     public function getFileUrls($uploadFolderName, $size = null)
     {
-        if ($size) {
-            $sizeFolderName = $this->getSizeConfig($size, 'folder');
+        $filenames = $this->getFilenames($uploadFolderName);
+        foreach ($filenames as $idx => $filename) {
+            $filenames[$idx] = $this->getFileUrl($uploadFolderName, $filename, $size);
         }
-        else {
-            $sizeFolderName = $this->getOriginalFolderName();
-        }
+
+        return $filenames;
+    }
+
+    /**
+     * Get file url for the given file in the given upload folder and for the given image size (optional)
+     *
+     * @param string $uploadFolderName
+     * @param string $filename
+     * @param string|null $size
+     * @return string
+     */
+    public function getFileUrl($uploadFolderName, $filename, $size = null)
+    {
+        $sizeFolderName = $this->getSizeConfig($size, 'folder');
 
         $urlPrefix = $this->getWebBasePath().DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR;
 
-        $files = $this->getFilenames($uploadFolderName);
-        foreach ($files as $idx => $file) {
-            $files[$idx] = $urlPrefix.$file;
+        return $this->getFileUrlForPrefix($urlPrefix, $filename, $size);
+    }
+
+    /**
+     * Get file url for the given temporary file in the given upload folder and for the given image size (optional)
+     *
+     * @param string $uploadFolderName
+     * @param string $filename
+     * @param string|null $size
+     * @return string
+     */
+    public function getTempFileUrl($uploadFolderName, $filename, $size = null)
+    {
+        $sizeFolderName = $this->getSizeConfig($size, 'folder');
+
+        $urlPrefix = $this->getTempWebBasePath().DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR;
+
+        return $this->getFileUrlForPrefix($urlPrefix, $filename, $size);
+    }
+
+    /**
+     * Get file url for the given temporary file in the given upload folder and for the given image size (optional)
+     *
+     * @param string $urlPrefix
+     * @param string $uploadFolderName
+     * @param string $filename
+     * @param string|null $size
+     * @return string
+     */
+    protected function getFileUrlForPrefix($urlPrefix, $filename, $size = null)
+    {
+        $proxyConfig = $this->getSizeConfig($size, 'proxy');
+
+        return $this->getProxyUrlForLocalUrl($proxyConfig, $urlPrefix.$filename);
+    }
+
+    /**
+     * @param array $proxyConfig
+     * @param string $localUrl
+     */
+    private function getProxyUrlForLocalUrl(array $proxyConfig = null, $localUrl) {
+        if ($proxyConfig && $proxyConfig['enabled']) {
+            $proxyUrl = $proxyConfig['url'];
+            if ($proxyConfig['parameters'] && is_array($proxyConfig['parameters'])) {
+                $proxyUrl = $proxyUrl.(false === strpos($proxyUrl, '?') ? '?' : '&').http_build_query($proxyConfig['parameters']);
+            }
+
+            return str_replace('~imageUrl~', $localUrl, $proxyUrl);
         }
 
-        return $files;
+        return $localUrl;
     }
 
 
@@ -71,13 +135,33 @@ class FileUploader
     }
 
     /**
-     * Get a list of temporary files.
+     * Get a list of temporary files already present.
      */
-    public function getTempFiles($uploadFolderName)
+    public function getTempFilenames($uploadFolderName)
     {
         $directory = $this->options['temp_file_base_path'].DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$this->getOriginalFolderName();
 
         return $this->fileManager->getFiles($directory);
+    }
+
+    /**
+     * Get a list of temporary files.
+     */
+    public function getTempFiles($uploadFolderName)
+    {
+        $result = array();
+
+        $filenames = $this->getTempFilenames($uploadFolderName);
+        foreach ($filenames as $filename) {
+            $result[] = array(
+                'thumbnailUrl' => $this->getTempFileUrl($uploadFolderName, $filename, 'thumbnail'),
+                'url' => $this->getTempFileUrl($uploadFolderName, $filename),
+                'name' => $filename,
+            );
+        }
+
+
+        return $result;
     }
 
     /**
@@ -170,29 +254,35 @@ class FileUploader
         $tempFilePath = $options['temp_file_base_path'] . '/' . $options['folder'];
         $tempWebPath = $options['temp_web_base_path'] . '/' . $options['folder'];
 
+        $imageVersions = array();
         foreach ($sizes as $index => $size)
         {
-            $sizes[$index]['upload_dir'] = $tempFilePath . '/' . $size['folder'] . '/';;
-            $sizes[$index]['upload_url'] = $tempWebPath . '/' . $size['folder'] . '/';
-            $sizes[$index]['no_cache'] = true;
+            $imageVersion = $size;
+            $imageVersion['no_cache'] = true;
+            if (isset($size['folder'])) {
+                $imageVersion['upload_dir'] = $tempFilePath . '/' . $size['folder'] . '/';
+                $imageVersion['upload_url'] = $tempWebPath . '/' . $size['folder'] . '/';
+                @mkdir($imageVersion['upload_dir'], 0777, true);
+            }
+            else {
+                $imageVersion['upload_dir'] = null;
+                $imageVersion['upload_url'] = null;
+            }
+            $imageVersions[$index] = $imageVersion;
         }
 
         $uploadDir = $tempFilePath . '/' . $this->getOriginalFolderName() . '/';;
         $uploadUrl = $tempWebPath . '/' . $this->getOriginalFolderName() . '/';
-
-        foreach ($sizes as $size)
-        {
-            @mkdir($size['upload_dir'], 0777, true);
-        }
-
         @mkdir($uploadDir, 0777, true);
 
         new $this->options['upload_handler_class'](
+            $this,
             array(
                 'file_namers' => $options['file_namers'],
+                'upload_folder_name' => $options['folder'],
                 'upload_dir' => $uploadDir, 
                 'upload_url' => $uploadUrl,
-                'image_versions' => $sizes,
+                'image_versions' => $imageVersions,
                 'accept_file_types' => $allowedExtensionsRegex,
                 'max_number_of_files' => $options['max_number_of_files'],
                 'max_file_size' => $options['max_file_size'],
@@ -203,17 +293,30 @@ class FileUploader
         exit(0);
     }
 
-    public function getOriginalFolderName() {
-        return $this->options['original']['folder'];
+    public function setOption($key, $value)
+    {
+        $this->options[$key] = $value;
     }
 
-    public function getThumbnailFolderName() {
-        return $this->getSizeConfig('thumbnail', 'folder');
+    public function getOption($key, $default = null)
+    {
+        return array_key_exists($key, $this->options) ? $this->options[$key] : $default;
+    }
+
+    protected function getOriginalFolderName() {
+        return $this->getSizeConfig('original', 'folder');
     }
 
     protected function getSizeConfig($size, $key, $default = null) {
+        if ($size === null) {
+            $size = 'original';
+        }
+
         $this->validateSize($size);
+
         $sizeConfig = $this->options['sizes'][$size];
+
+        $this->validateSizeConfig($size, $sizeConfig);
 
         if (array_key_exists($key, $sizeConfig)) {
             return $sizeConfig[$key];
@@ -225,6 +328,12 @@ class FileUploader
     protected function validateSize($size) {
         if (!array_key_exists($size, $this->options['sizes'])) {
             throw new FileUploaderException('Invalid size: '.$size);
+        }
+    }
+
+    protected function validateSizeConfig($size, $sizeConfig) {
+        if (!isset($sizeConfig['folder']) && (!isset($sizeConfig['proxy']) || !isset($sizeConfig['proxy']['enabled']) || !$sizeConfig['proxy']['enabled'])) {
+            throw new FileUploaderException('Invalid config for size "'.$size.'": please define a folder and/or a proxy');
         }
     }
 }

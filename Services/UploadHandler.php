@@ -7,6 +7,41 @@ use Lcn\FileUploaderBundle\Exception\FileUploaderException;
 
 class UploadHandler extends \Lcn\FileUploaderBundle\BlueImp\UploadHandler
 {
+
+    /**
+     * @var FileUploader
+     */
+    protected $fileUploader;
+
+    public function __construct(FileUploader $fileUploader, $options = null, $initialize = true, $error_messages = null)
+    {
+        $this->fileUploader = $fileUploader;
+        parent::__construct($options, $initialize, $error_messages);
+    }
+
+    /**
+     * Override method: respect image proxy config setting if available
+     *
+     * @param $file_name
+     * @param null $version
+     * @param bool|false $direct
+     * @return string
+     */
+    protected function get_download_url($file_name, $version = null, $direct = false) {
+        if (!$direct && $this->options['download_via_php']) {
+            $url = $this->options['script_url']
+              .$this->get_query_separator($this->options['script_url'])
+              .$this->get_singular_param_name()
+              .'='.rawurlencode($file_name);
+            if ($version) {
+                $url .= '&version='.rawurlencode($version);
+            }
+            return $url.'&download=1';
+        }
+
+        return $this->fileUploader->getTempFileUrl($this->options['upload_folder_name'], $file_name, $version);
+    }
+
     /**
      *
      * Override method: avoid double slashes

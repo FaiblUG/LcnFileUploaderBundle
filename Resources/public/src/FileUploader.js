@@ -9,8 +9,6 @@ var LcnFileUploader = (function($) {
     this.options = options;
     this.viewUrl = options.viewUrl;
     this.uploadUrl = options.uploadUrl;
-    this.originalFolderName = options.originalFolderName;
-    this.thumbnailFolderName = options.thumbnailFolderName;
 
     this.$el = $(options.el);
     this.$el.addClass('lcn-file-uploader');
@@ -27,7 +25,6 @@ var LcnFileUploader = (function($) {
     this.positionInputOverlay(this.$add);
 
     this.uploading = false;
-
 
     if (options.existingFiles) {
       this.addExistingFiles(options.existingFiles);
@@ -188,12 +185,7 @@ var LcnFileUploader = (function($) {
 
     addExistingFiles: function (files) {
       _.each(files, function (file) {
-        this.appendEditableImage({
-          // cmsMediaUrl is a global variable set by the underscoreTemplates partial of MediaItems.html.twig
-          'thumbnailUrl': /(\.png|\.jpg|\.jpeg|\.gif)$/i.test(file) ? this.viewUrl + '/'+this.thumbnailFolderName+'/' + file : undefined,
-          'url': this.viewUrl + '/'+this.originalFolderName+'/' + file,
-          'name': file
-        });
+        this.appendEditableImage(file);
       }.bind(this));
     },
 

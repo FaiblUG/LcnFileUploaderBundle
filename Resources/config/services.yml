@@ -9,6 +9,7 @@ parameters:
   lcn_file_uploader.assets.js.main: '/bundles/lcnfileuploader/dist/main.js'
   lcn_file_uploader.assets.css.main: '/bundles/lcnfileuploader/dist/main.css'
   lcn_file_uploader.assets.css.theme: '/bundles/lcnfileuploader/dist/theme.css'
+  lcn_file_uploader.image_proxy_enabled: false
 
   lcn_file_uploader.allowed_extensions:
     # Mime types are just for documentation's sake.
@@ -36,16 +37,10 @@ parameters:
     - txt #text/plain
     - rtf #text/rtf
 
-  # Folder where originals are uploaded. This is the only folder populated for
-  # uploads that are not images
-  lcn_file_uploader.original:
-      folder: original
-
   # Define sizes for image uploads
   lcn_file_uploader.sizes:
     # Depending on your further requirements, you might want to define additional image sizes.
-    # However, more advanced solutions exist for image resampling, e.g.
-    # https://github.com/liip/LiipImagineBundle.
+    # For advanced image resizing and optimization, you can optionally configure an image proxy (e.g.imgix.com).
 
     # required: "thumbnail"
     thumbnail:
@@ -53,16 +48,32 @@ parameters:
       max_width: 200
       max_height: 150
       crop: true
+      proxy:
+        enabled: %lcn_file_uploader.image_proxy_enabled%
+        url: https://my-source.imgix.com~imageUrl~
+        parameters:
+          w: 200
+          h: 150
+          crop: fit
+
     # optional: "original" - define original image size if you want to restrict the maximum image dimensions:
     original:
       folder: original
       max_width: 3000
       max_height: 2250
       crop: false
+      proxy:
+        enabled: %lcn_file_uploader.image_proxy_enabled%
+        url: https://my-source.imgix.com/~imageUrl~
+        parameters:
+          w: 200
+          h: 150
+          crop: fit
 
 services:
     lcn.file_uploader:
         class: Lcn\FileUploaderBundle\Services\FileUploader
+        scope: prototype
         arguments:
           - file_namers: ['@lcn.file_uploader_file_namer_cache_buster', '@lcn.file_uploader_file_namer_hash']
             file_manager: '@lcn.file_uploader_file_manager'
@@ -73,7 +84,6 @@ services:
             temp_web_base_path: '%lcn_file_uploader.temp_web_base_path%'
             allowed_extensions: '%lcn_file_uploader.allowed_extensions%'
             sizes: '%lcn_file_uploader.sizes%'
-            original: '%lcn_file_uploader.original%'
             max_number_of_files: '%lcn_file_uploader.max_number_of_files%'
             max_file_size: '%lcn_file_uploader.max_file_size%'
 
@@ -100,13 +110,13 @@ services:
 
     lcn.file_uploader_cleanup_command:
         class: Lcn\FileUploaderBundle\Command\CleanupCommand
-        arguments: [@lcn.file_uploader]
+        arguments: [@service_container]
         tags:
             -  { name: console.command }
 
     lcn.file_uploader.twig_extension:
         class: Lcn\FileUploaderBundle\Twig\FileUploaderExtension
-        arguments: [@lcn.file_uploader]
+        arguments: [@service_container]
         tags:
             - { name: twig.extension }
 

@@ -6,6 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CleanupCommand extends Command
 {
@@ -14,8 +15,8 @@ class CleanupCommand extends Command
      */
     protected $fileUploader;
 
-    public function __construct(FileUploader $fileUploader) {
-        $this->fileUploader = $fileUploader;
+    public function __construct(ContainerInterface $container) {
+        $this->fileUploader = $container->get('lcn.file_uploader');
 
         parent::__construct();
     }

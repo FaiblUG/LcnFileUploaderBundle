@@ -303,8 +303,7 @@ The image sizes are defined as lcn_file_uploader.sizes parameter:
   # Define sizes for image uploads
   lcn_file_uploader.sizes:
     # Depending on your further requirements, you might want to define additional image sizes.
-    # However, more advanced solutions exist for image resampling, e.g.
-    # https://github.com/liip/LiipImagineBundle.
+    # For advanced image resizing and optimization, you can also configura an image proxy.
     
     # required: "thumbnail" 
     thumbnail:
@@ -320,6 +319,36 @@ The image sizes are defined as lcn_file_uploader.sizes parameter:
       crop: false
 ```
 
+For advanced image resizing and optimization, you can optionally configure an image proxy (e.g.imgix.com).
+```yaml
+  # Define sizes for image uploads
+  lcn_file_uploader.sizes:
+    thumbnail:
+       proxy:
+         url: https://my-source.imgix.com~imageUrl~
+         parameters:
+           w: 200
+           h: 150
+           crop: fit
+  ...
+```
+
+~imageUrl~ gets replaced with the relative url to the uploaded image source.
+The parameters array is used to pass additional query string parameters.
+
+If you are using an image proxy, you can remove the folder setting if you do not want to store the resized version on your own space at all.
+That is, except for the "original" size which is used as the data source.
+
+*Important:* You also need to explicitly enable the image proxy using the parameter `lcn_file_uploader.image_proxy_enabled`:
+
+```yaml
+parameters:
+  ...
+  lcn_file_uploader.image_proxy_enabled: true
+  ...
+```
+
+This is especially helpful if you only want want to leverage the proxy in prod environments.
 
 ### Advanced Usage
 
