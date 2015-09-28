@@ -10,6 +10,7 @@ parameters:
   lcn_file_uploader.assets.css.main: '/bundles/lcnfileuploader/dist/main.css'
   lcn_file_uploader.assets.css.theme: '/bundles/lcnfileuploader/dist/theme.css'
   lcn_file_uploader.image_proxy_enabled: false
+  lcn_file_uploader.image_file_extension_test_regex: '/\.(gif|jpe?g|png)$/i'
 
   lcn_file_uploader.allowed_extensions:
     # Mime types are just for documentation's sake.
@@ -52,23 +53,25 @@ parameters:
         enabled: %lcn_file_uploader.image_proxy_enabled%
         url: https://my-source.imgix.com~imageUrl~
         parameters:
-          w: 200
-          h: 150
-          crop: fit
+          w: ~max_width~
+          h: ~max_height~
+          fit: crop
+          crop: faces
 
-    # optional: "original" - define original image size if you want to restrict the maximum image dimensions:
+
+    # required: "original" - used to store "original" versions of files (resamples images if needed)
     original:
       folder: original
-      max_width: 3000
-      max_height: 2250
+      max_width: 2000
+      max_height: 1125
       crop: false
       proxy:
         enabled: %lcn_file_uploader.image_proxy_enabled%
-        url: https://my-source.imgix.com/~imageUrl~
+        url: https://my-source.imgix.com~imageUrl~
         parameters:
-          w: 200
-          h: 150
-          crop: fit
+          w: ~max_width~
+          h: ~max_height~
+          fit: clip
 
 services:
     lcn.file_uploader:
@@ -86,6 +89,7 @@ services:
             sizes: '%lcn_file_uploader.sizes%'
             max_number_of_files: '%lcn_file_uploader.max_number_of_files%'
             max_file_size: '%lcn_file_uploader.max_file_size%'
+            image_file_extension_test_regex: '%lcn_file_uploader.image_file_extension_test_regex%'
 
     lcn.file_uploader_file_manager:
         class: Lcn\FileUploaderBundle\Services\FileManager

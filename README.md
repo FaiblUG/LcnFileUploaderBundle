@@ -314,8 +314,8 @@ The image sizes are defined as lcn_file_uploader.sizes parameter:
     # optional: "original" - define original image size if you want to restrict the maximum image dimensions:
     original:
       folder: original
-      max_width: 3000
-      max_height: 2250
+      max_width: 1000
+      max_height: 1125
       crop: false
 ```
 
@@ -323,21 +323,28 @@ For advanced image resizing and optimization, you can optionally configure an im
 ```yaml
   # Define sizes for image uploads
   lcn_file_uploader.sizes:
-    thumbnail:
-       proxy:
-         url: https://my-source.imgix.com~imageUrl~
-         parameters:
-           w: 200
-           h: 150
-           crop: fit
+    avatar:
+      folder: null #do not store locally - pipe original size through defined proxy
+      max_width: 300
+      max_height: 300
+      proxy:
+        enabled: %lcn_file_uploader.image_proxy_enabled%
+        url: https://my-source.imgix.com~imageUrl~
+        parameters:
+          w: ~max_width~
+          h: ~max_height~
+          fit: crop
+          crop: faces
   ...
 ```
 
-~imageUrl~ gets replaced with the relative url to the uploaded image source.
+~imageUrl~ gets replaced with the url to the uploaded image source.
 The parameters array is used to pass additional query string parameters.
+~max_width~ and ~max_height~ get replaced with the corresponding values defined for the given image size.
 
-If you are using an image proxy, you can remove the folder setting if you do not want to store the resized version on your own space at all.
-That is, except for the "original" size which is used as the data source.
+
+If you are using an image proxy, you can remove the folder setting if you do not want to store the resized version on your own disk at all.
+However, the "original" and "thumbnail" sizes still need a folder setting!
 
 *Important:* You also need to explicitly enable the image proxy using the parameter `lcn_file_uploader.image_proxy_enabled`:
 

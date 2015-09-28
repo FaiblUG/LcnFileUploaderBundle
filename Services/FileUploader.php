@@ -50,9 +50,7 @@ class FileUploader
      */
     public function getFileUrl($uploadFolderName, $filename, $size = null)
     {
-        $sizeFolderName = $this->getSizeConfig($size, 'folder');
-
-        $urlPrefix = $this->getWebBasePath().DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR;
+        $urlPrefix = $this->getWebBasePath().DIRECTORY_SEPARATOR.$uploadFolderName;
 
         return $this->getFileUrlForPrefix($urlPrefix, $filename, $size);
     }
@@ -67,9 +65,7 @@ class FileUploader
      */
     public function getTempFileUrl($uploadFolderName, $filename, $size = null)
     {
-        $sizeFolderName = $this->getSizeConfig($size, 'folder');
-
-        $urlPrefix = $this->getTempWebBasePath().DIRECTORY_SEPARATOR.$uploadFolderName.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR;
+        $urlPrefix = $this->getTempWebBasePath().DIRECTORY_SEPARATOR.$uploadFolderName;
 
         return $this->getFileUrlForPrefix($urlPrefix, $filename, $size);
     }
@@ -83,21 +79,38 @@ class FileUploader
      * @param string|null $size
      * @return string
      */
-    protected function getFileUrlForPrefix($urlPrefix, $filename, $size = null)
+    public function getFileUrlForPrefix($urlPrefix, $filename, $size = null)
     {
-        $proxyConfig = $this->getSizeConfig($size, 'proxy');
+        $sizeFolderName = $this->getFolderNameForSize($size, true);
 
-        return $this->getProxyUrlForLocalUrl($proxyConfig, $urlPrefix.$filename);
+        return $this->getProxyUrlForLocalUrl($size, $urlPrefix.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR.$filename);
+    }
+
+    protected function getFolderNameForSize($size, $useOriginalAsFallback = false)
+    {
+        $sizeFolderName = $this->getSizeConfig($size, 'folder');
+        if (!$sizeFolderName && $useOriginalAsFallback && $size !== 'original') {
+            $sizeFolderName = $this->getSizeConfig('original', 'folder');
+        }
+
+
+        if (!$sizeFolderName) {
+            throw new FileUploaderException('Could not determine upload folder name for size: '.$size);
+        }
+
+        return $sizeFolderName;
     }
 
     /**
      * @param array $proxyConfig
      * @param string $localUrl
      */
-    private function getProxyUrlForLocalUrl(array $proxyConfig = null, $localUrl) {
+    private function getProxyUrlForLocalUrl($size = null, $localUrl) {
+        $proxyConfig = $this->getSizeConfig($size, 'proxy');
         if ($proxyConfig && $proxyConfig['enabled']) {
             $proxyUrl = $proxyConfig['url'];
             if ($proxyConfig['parameters'] && is_array($proxyConfig['parameters'])) {
+                $parameters = $this->getProxyParameters($proxyConfig['parameters'], $size);
                 $proxyUrl = $proxyUrl.(false === strpos($proxyUrl, '?') ? '?' : '&').http_build_query($proxyConfig['parameters']);
             }
 
@@ -105,6 +118,17 @@ class FileUploader
         }
 
         return $localUrl;
+    }
+
+    private function getProxyParameters($parameters, $size) {
+        $result = array();
+        $maxWidth = $this->getSizeConfig($size, 'max_width');
+        $maxHeight = $this->getSizeConfig($size, 'max_height');
+        foreach ($parameters as $key => $value) {
+            $result[$key] = str_replace(array('~max_width~', '~max_height~'), array($maxWidth, $maxHeight), $value);
+        }
+
+        return $result;
     }
 
 
@@ -154,7 +178,7 @@ class FileUploader
         $filenames = $this->getTempFilenames($uploadFolderName);
         foreach ($filenames as $filename) {
             $result[] = array(
-                'thumbnailUrl' => $this->getTempFileUrl($uploadFolderName, $filename, 'thumbnail'),
+                'thumbnailUrl' => $this->isValidImageFilename($filename) ? $this->getTempFileUrl($uploadFolderName, $filename, 'thumbnail') : null,
                 'url' => $this->getTempFileUrl($uploadFolderName, $filename),
                 'name' => $filename,
             );
@@ -162,6 +186,10 @@ class FileUploader
 
 
         return $result;
+    }
+
+    protected function isValidImageFilename($filename) {
+        return !!preg_match($this->options['image_file_extension_test_regex'], $filename);
     }
 
     /**
@@ -257,18 +285,15 @@ class FileUploader
         $imageVersions = array();
         foreach ($sizes as $index => $size)
         {
-            $imageVersion = $size;
-            $imageVersion['no_cache'] = true;
             if (isset($size['folder'])) {
+                $imageVersion = $size;
+                $imageVersion['no_cache'] = true;
                 $imageVersion['upload_dir'] = $tempFilePath . '/' . $size['folder'] . '/';
                 $imageVersion['upload_url'] = $tempWebPath . '/' . $size['folder'] . '/';
                 @mkdir($imageVersion['upload_dir'], 0777, true);
+                $imageVersions[$index] = $imageVersion;
             }
-            else {
-                $imageVersion['upload_dir'] = null;
-                $imageVersion['upload_url'] = null;
-            }
-            $imageVersions[$index] = $imageVersion;
+
         }
 
         $uploadDir = $tempFilePath . '/' . $this->getOriginalFolderName() . '/';;
@@ -316,8 +341,6 @@ class FileUploader
 
         $sizeConfig = $this->options['sizes'][$size];
 
-        $this->validateSizeConfig($size, $sizeConfig);
-
         if (array_key_exists($key, $sizeConfig)) {
             return $sizeConfig[$key];
         }
@@ -328,12 +351,6 @@ class FileUploader
     protected function validateSize($size) {
         if (!array_key_exists($size, $this->options['sizes'])) {
             throw new FileUploaderException('Invalid size: '.$size);
-        }
-    }
-
-    protected function validateSizeConfig($size, $sizeConfig) {
-        if (!isset($sizeConfig['folder']) && (!isset($sizeConfig['proxy']) || !isset($sizeConfig['proxy']['enabled']) || !$sizeConfig['proxy']['enabled'])) {
-            throw new FileUploaderException('Invalid config for size "'.$size.'": please define a folder and/or a proxy');
         }
     }
 }

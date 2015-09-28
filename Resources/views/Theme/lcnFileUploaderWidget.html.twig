@@ -54,9 +54,9 @@
     {% spaceless %}
         {# parameters to underscore template: name, thumbnail_url, original_url #}
         <li class="thumbnail" data-name="<%- name %>" data-uploaded-file>
-            <div class="thumbnail-inner"<% if ('undefined' != typeof thumbnailUrl) { %> data-action="replace"<% } %>>
+            <div class="thumbnail-inner"<% if ('undefined' != typeof thumbnailUrl && thumbnailUrl) { %> data-action="replace"<% } %>>
             {# Some things can be thumbnailed, some things not #}
-            <% if ('undefined' != typeof thumbnailUrl) { %>
+            <% if ('undefined' != typeof thumbnailUrl && thumbnailUrl) { %>
                 <img src="<%- thumbnailUrl %>">
             <% } else { %>
                 <a title="{{ 'download_file'|trans }}" class="download thumbnail-action btn" target="_blank" href="<%- url %>"><%- name %></a>
