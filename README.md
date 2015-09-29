@@ -319,7 +319,7 @@ The image sizes are defined as lcn_file_uploader.sizes parameter:
       crop: false
 ```
 
-For advanced image resizing and optimization, you can optionally configure an image proxy (e.g.imgix.com).
+For advanced image resizing and optimization, you can optionally configure an image proxy (e.g.imgix.net).
 ```yaml
   # Define sizes for image uploads
   lcn_file_uploader.sizes:
@@ -329,7 +329,7 @@ For advanced image resizing and optimization, you can optionally configure an im
       max_height: 300
       proxy:
         enabled: %lcn_file_uploader.image_proxy_enabled%
-        url: https://my-source.imgix.com~imageUrl~
+        url: https://my-source.imgix.net~imageUrl~
         parameters:
           w: ~max_width~
           h: ~max_height~

@@ -119,7 +119,7 @@ class FileUploader
             $proxyUrl = $proxyConfig['url'];
             if ($proxyConfig['parameters'] && is_array($proxyConfig['parameters'])) {
                 $parameters = $this->getProxyParameters($proxyConfig['parameters'], $size);
-                $proxyUrl = $proxyUrl.(false === strpos($proxyUrl, '?') ? '?' : '&').http_build_query($proxyConfig['parameters']);
+                $proxyUrl = $proxyUrl.(false === strpos($proxyUrl, '?') ? '?' : '&').http_build_query($parameters);
             }
 
             return str_replace('~imageUrl~', $localUrl, $proxyUrl);

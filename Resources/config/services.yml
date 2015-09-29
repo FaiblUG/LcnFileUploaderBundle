@@ -9,8 +9,16 @@ parameters:
   lcn_file_uploader.assets.js.main: '/bundles/lcnfileuploader/dist/main.js'
   lcn_file_uploader.assets.css.main: '/bundles/lcnfileuploader/dist/main.css'
   lcn_file_uploader.assets.css.theme: '/bundles/lcnfileuploader/dist/theme.css'
-  lcn_file_uploader.image_proxy_enabled: false
   lcn_file_uploader.image_file_extension_test_regex: '/\.(gif|jpe?g|png)$/i'
+
+  lcn_file_uploader.image_proxy_enabled: false
+  lcn_file_uploader.image_proxy_url: https://my-source.imgix.net~imageUrl~
+  lcn_file_uploader.image_proxy_parameters:
+    w: ~max_width~
+    h: ~max_height~
+    fit: crop
+    crop: faces
+
 
   lcn_file_uploader.allowed_extensions:
     # Mime types are just for documentation's sake.
@@ -41,7 +49,7 @@ parameters:
   # Define sizes for image uploads
   lcn_file_uploader.sizes:
     # Depending on your further requirements, you might want to define additional image sizes.
-    # For advanced image resizing and optimization, you can optionally configure an image proxy (e.g.imgix.com).
+    # For advanced image resizing and optimization, you can optionally configure an image proxy (e.g.imgix.net).
 
     # required: "thumbnail"
     thumbnail:
@@ -51,12 +59,8 @@ parameters:
       crop: true
       proxy:
         enabled: %lcn_file_uploader.image_proxy_enabled%
-        url: https://my-source.imgix.com~imageUrl~
-        parameters:
-          w: ~max_width~
-          h: ~max_height~
-          fit: crop
-          crop: faces
+        url: %lcn_file_uploader.image_proxy_url%
+        parameters: %lcn_file_uploader.image_proxy_parameters%
 
 
     # required: "original" - used to store "original" versions of files (resamples images if needed)
@@ -67,11 +71,12 @@ parameters:
       crop: false
       proxy:
         enabled: %lcn_file_uploader.image_proxy_enabled%
-        url: https://my-source.imgix.com~imageUrl~
+        url: %lcn_file_uploader.image_proxy_url%
         parameters:
           w: ~max_width~
           h: ~max_height~
           fit: clip
+
 
 services:
     lcn.file_uploader:
