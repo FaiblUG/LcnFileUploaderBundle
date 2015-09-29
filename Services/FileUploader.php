@@ -3,20 +3,21 @@
 namespace Lcn\FileUploaderBundle\Services;
 
 use Lcn\FileUploaderBundle\Exception\FileUploaderException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class FileUploader
 {
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @var FileManager
      */
     protected $fileManager;
-
-    /**
-     * @var Request
-     */
-    protected $request;
 
     /**
      * @var array
@@ -25,7 +26,7 @@ class FileUploader
 
     public function __construct($options)
     {
-        $this->request = $options['request'];
+        $this->container = $options['container'];
         $this->fileManager = $options['file_manager'];
         $this->options = $options;
     }
@@ -124,7 +125,7 @@ class FileUploader
             return str_replace('~imageUrl~', $localUrl, $proxyUrl);
         }
         else {
-            return $this->request->getSchemeAndHttpHost().$localUrl;
+            return $this->getRequest()->getSchemeAndHttpHost().$localUrl;
         }
     }
 
@@ -360,5 +361,12 @@ class FileUploader
         if (!array_key_exists($size, $this->options['sizes'])) {
             throw new FileUploaderException('Invalid size: '.$size);
         }
+    }
+
+    /**
+     * @return Request
+     */
+    protected function getRequest() {
+        return $this->container->get('request');
     }
 }

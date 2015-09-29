@@ -90,7 +90,7 @@ services:
             max_number_of_files: '%lcn_file_uploader.max_number_of_files%'
             max_file_size: '%lcn_file_uploader.max_file_size%'
             image_file_extension_test_regex: '%lcn_file_uploader.image_file_extension_test_regex%'
-            request: '@request'
+            container: '@service_container'
 
     lcn.file_uploader_file_manager:
         class: Lcn\FileUploaderBundle\Services\FileManager
