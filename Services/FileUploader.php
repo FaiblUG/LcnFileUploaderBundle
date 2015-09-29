@@ -3,6 +3,7 @@
 namespace Lcn\FileUploaderBundle\Services;
 
 use Lcn\FileUploaderBundle\Exception\FileUploaderException;
+use Symfony\Component\HttpFoundation\Request;
 
 class FileUploader
 {
@@ -13,12 +14,18 @@ class FileUploader
     protected $fileManager;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * @var array
      */
     protected $options;
 
     public function __construct($options)
     {
+        $this->request = $options['request'];
         $this->fileManager = $options['file_manager'];
         $this->options = $options;
     }
@@ -83,7 +90,7 @@ class FileUploader
     {
         $sizeFolderName = $this->getFolderNameForSize($size, true);
 
-        return $this->getProxyUrlForLocalUrl($size, $urlPrefix.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR.$filename);
+        return $this->getAbsoluteUrlForLocalUrl($size, $urlPrefix.DIRECTORY_SEPARATOR.$sizeFolderName.DIRECTORY_SEPARATOR.$filename);
     }
 
     protected function getFolderNameForSize($size, $useOriginalAsFallback = false)
@@ -105,7 +112,7 @@ class FileUploader
      * @param array $proxyConfig
      * @param string $localUrl
      */
-    private function getProxyUrlForLocalUrl($size = null, $localUrl) {
+    private function getAbsoluteUrlForLocalUrl($size = null, $localUrl) {
         $proxyConfig = $this->getSizeConfig($size, 'proxy');
         if ($proxyConfig && $proxyConfig['enabled']) {
             $proxyUrl = $proxyConfig['url'];
@@ -116,8 +123,9 @@ class FileUploader
 
             return str_replace('~imageUrl~', $localUrl, $proxyUrl);
         }
-
-        return $localUrl;
+        else {
+            return $this->request->getSchemeAndHttpHost().$localUrl;
+        }
     }
 
     private function getProxyParameters($parameters, $size) {
