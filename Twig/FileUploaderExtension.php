@@ -29,7 +29,6 @@ class FileUploaderExtension extends Twig_Extension
     {
         return array(
             'lcn_file_uploader_get_temp_files' => new Twig_Function_Method($this, 'getTempFiles'),
-            'lcn_file_uploader_get_temp_web_path' => new Twig_Function_Method($this, 'getTempWebPath'),
             'lcn_file_uploader_get_unique_widget_id' => new Twig_Function_Method($this, 'getUniqueWidgetId'),
         );
     }
@@ -37,11 +36,6 @@ class FileUploaderExtension extends Twig_Extension
     public function getTempFiles($uploadFolderName)
     {
         return $this->fileUploader->getTempFiles($uploadFolderName);
-    }
-
-    public function getTempWebPath($folder)
-    {
-        return $this->fileUploader->getTempWebBasePath().DIRECTORY_SEPARATOR.$folder;
     }
 
     public function getUniqueWidgetId() {

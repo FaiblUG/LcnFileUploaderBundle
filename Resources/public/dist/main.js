@@ -2056,7 +2056,6 @@ var LcnFileUploader = (function($) {
 
   function LcnFileUploader(options) {
     this.options = options;
-    this.viewUrl = options.viewUrl;
     this.uploadUrl = options.uploadUrl;
 
     this.$el = $(options.el);
