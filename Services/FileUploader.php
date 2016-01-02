@@ -125,7 +125,11 @@ class FileUploader
             return str_replace('~imageUrl~', $localUrl, $proxyUrl);
         }
         else {
-            return $this->getRequest()->getSchemeAndHttpHost().$localUrl;
+            if (0 !== strpos($localUrl, 'http')) {
+                $localUrl = $this->getRequest()->getSchemeAndHttpHost() . $localUrl;
+            }
+
+            return $localUrl;
         }
     }
 
