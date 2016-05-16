@@ -120,18 +120,18 @@ services:
 
     lcn.file_uploader_cleanup_command:
         class: Lcn\FileUploaderBundle\Command\CleanupCommand
-        arguments: [@service_container]
+        arguments: ['@service_container']
         tags:
             -  { name: console.command }
 
     lcn.file_uploader.twig_extension:
         class: Lcn\FileUploaderBundle\Twig\FileUploaderExtension
-        arguments: [@service_container]
+        arguments: ['@service_container']
         tags:
             - { name: twig.extension }
 
     lcn.file_uploader.include_assets_twig_extension:
         class: Lcn\FileUploaderBundle\Twig\FileUploaderIncludeAssetsExtension
-        arguments: [@service_container, '%lcn_file_uploader.assets.js.main%', '%lcn_file_uploader.assets.css.main%', '%lcn_file_uploader.assets.css.theme%']
+        arguments: ['@service_container', '%lcn_file_uploader.assets.js.main%', '%lcn_file_uploader.assets.css.main%', '%lcn_file_uploader.assets.css.theme%']
         tags:
             - { name: twig.extension }
